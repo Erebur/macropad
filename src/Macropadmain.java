@@ -13,7 +13,7 @@ public class Macropadmain {
 
     public static void main(String[] args) throws InterruptedException, FileNotFoundException {
         //noinspection InfiniteLoopStatement
-        while (true){
+        while (preset != 0){
             //FileReader fr = new FileReader("config");
 
             SerialPort comPort = null;
@@ -45,7 +45,7 @@ public class Macropadmain {
     private static void keypress(SerialPort comPort) throws AWTException, InterruptedException {
         int oldinput = 0 ;
 
-        while (true) {
+        while (preset != 0) {
             Scanner s     = new Scanner(comPort.getInputStream());
             Robot   robot = new Robot();
 
@@ -123,11 +123,12 @@ public class Macropadmain {
     }
         //Dialogue
     private static void presetswichdialog(){
-        String fk ="Function keys" , wasd = "Wasd etc" , numpad = "numpad(wip)";
-        Object[] possibilities = {fk , wasd , numpad};
+        String fk ="Function keys" , wasd = "Wasd etc" , numpad = "numpad(wip)" , exit = "exit";
+        Object[] possibilities = {fk , wasd , numpad , exit};
         Icon     icon          = null;
 
         String presetInString = (String)JOptionPane.showInputDialog(null,"choose preset","Preset",JOptionPane.QUESTION_MESSAGE,null,possibilities,"1");
+        if (presetInString.equals(exit))    setPreset(0);
         if (presetInString.equals(fk))      setPreset(1);;
         if (presetInString.equals(wasd))    setPreset(2);
         if (presetInString.equals(numpad))  setPreset(3);//TODO no preset 3
