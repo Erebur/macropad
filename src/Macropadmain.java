@@ -3,16 +3,14 @@ import com.fazecast.jSerialComm.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.util.Scanner;
 
 public class Macropadmain {
 
     private static  int preset = 1 ;
 
-    public static void main(String[] args) throws InterruptedException, FileNotFoundException {
-        //noinspection InfiniteLoopStatement
+    public static void main(String[] args) throws InterruptedException {
+
         while (preset != 0){
             //FileReader fr = new FileReader("config");
 
@@ -86,7 +84,6 @@ public class Macropadmain {
 
         //belegung
     private static int getKey(int input) {
-        int fehler = 0  , presetswich = 0 ;
         //https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
         if (preset == 1) {
             return switch (input) {
@@ -102,7 +99,7 @@ public class Macropadmain {
                 case 11 -> KeyEvent.VK_F22;
                 case 12 -> KeyEvent.VK_F23;
                 case 13 -> KeyEvent.VK_F24;
-                default -> fehler = 1 ;
+                default -> 1 ;
             };
         }else if (preset == 2 ){
             return switch (input) {
@@ -127,11 +124,10 @@ public class Macropadmain {
     private static void presetswichdialog(){
         String fk ="Function keys" , wasd = "Wasd etc" , numpad = "numpad(wip)" , exit = "exit";
         Object[] possibilities = {fk , wasd , numpad , exit};
-        Icon     icon          = null;
 
         String presetInString = (String)JOptionPane.showInputDialog(null,"choose preset","Preset",JOptionPane.QUESTION_MESSAGE,null,possibilities,"1");
         if (presetInString.equals(exit))    setPreset(0);
-        if (presetInString.equals(fk))      setPreset(1);;
+        if (presetInString.equals(fk))      setPreset(1);
         if (presetInString.equals(wasd))    setPreset(2);
         if (presetInString.equals(numpad))  setPreset(3);//TODO no preset 3
     }
@@ -146,9 +142,9 @@ public class Macropadmain {
             Thread.sleep(20);
     }
 
-    public static int getPreset() {
-        return preset;
-    }
+//    public static int getPreset() {
+//        return preset;
+//    }
 
     public static void setPreset(int preset) {
         Macropadmain.preset = preset;
