@@ -8,16 +8,19 @@ import java.io.FileReader;
 import java.util.Scanner;
 
 public class Macropadmain {
+
+    private static int preset = 0 ;
+
     public static void main(String[] args) throws InterruptedException, FileNotFoundException {
         //noinspection InfiniteLoopStatement
         while (true){
-            FileReader fr = new FileReader("config");
+            //FileReader fr = new FileReader("config");
 
             SerialPort comPort = null;
             //serial port reader
             try {
                 System.out.println("Started");
-
+                //reads the second (first real) open port
                 comPort = SerialPort.getCommPorts()[ 1 ];
                 comPort.openPort();
 
@@ -34,11 +37,9 @@ public class Macropadmain {
                 //noinspection BusyWait
                 Thread.sleep(10000);
             }
-
         }
-
-
     }
+
 
     @SuppressWarnings("InfiniteLoopStatement")
     private static void keypress(SerialPort comPort) throws AWTException, InterruptedException {
@@ -53,26 +54,28 @@ public class Macropadmain {
             //saves input in int
 
             int input = s.nextInt();
-            System.out.println(input);
+            System.out.print(input);
 
 
             int key = getKey(input);
-            //int key = belegung[ input ];
 
+            if (key == 1 ){
+                JOptionPane.showMessageDialog(null,"bad input " + input);
+            }else if (key ==  0){
+                presetswichdialog();
+            }else{
+                robot.keyPress(key);
+                robot.keyRelease(key);
+            }
 
             //System.out.println(key);
-
-            robot.keyPress(key);
-            robot.keyRelease(key);
-
 
         }
     }
 
-    private static int preset = 0 ;
 
     private static int getKey(int input) {
-        int fehler = 0 ;
+        int fehler = 0  , presetswich = 0 ;
         //https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
         if (preset == 0 ) {
             return switch (input) {
@@ -84,7 +87,7 @@ public class Macropadmain {
                 case 7 -> KeyEvent.VK_F18;
                 case 8 -> KeyEvent.VK_F19;
                 case 9 -> KeyEvent.VK_F20;
-                case 10 -> preset = 1 ;
+                case 10 -> 0;
                 case 11 -> KeyEvent.VK_F22;
                 case 12 -> KeyEvent.VK_F23;
                 case 13 -> KeyEvent.VK_F24;
@@ -100,24 +103,39 @@ public class Macropadmain {
                 case 7 -> KeyEvent.VK_W;
                 case 8 -> KeyEvent.VK_E;
                 case 9 -> KeyEvent.VK_R;
-                case 10 -> preset = 0 ;
+                case 10 ->  0  ;
                 case 11 -> KeyEvent.VK_1;
                 case 12 -> KeyEvent.VK_2;
                 case 13 -> KeyEvent.VK_3;
-                default -> fehler = 1 ;
+                default -> 1 ;
             };
         }
 
-        if (fehler == 1 ){
-            JOptionPane.showMessageDialog(null,"bad input " + input);
-        }
         return KeyEvent.VK_DELETE;
+    }
+
+    private static void presetswichdialog(){
+        String fk ="Function keys" , wasd = "Wasd etc" , numpad = "numpad";
+        Object[] possibilities = {fk , wasd , numpad};
+        Icon     icon          = null;
+        String presetInString = (String)JOptionPane.showInputDialog(null,"choose preset","Preset",JOptionPane.QUESTION_MESSAGE,null,possibilities,"1");
+        if (presetInString.equals(fk))      preset = 1 ;
+        if (presetInString.equals(wasd))    preset = 2 ;
+        if (presetInString.equals(numpad))  preset = 3 ;//TODO no preset 3
     }
 
     private static void waiting(SerialPort comPort) throws InterruptedException {
         while (comPort.bytesAvailable() == 0)
             //noinspection BusyWait
             Thread.sleep(20);
+    }
+
+    public static int getPreset() {
+        return preset;
+    }
+
+    public static void setPreset(int preset) {
+        Macropadmain.preset = preset;
     }
 
 }
