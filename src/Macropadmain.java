@@ -1,5 +1,6 @@
 import com.fazecast.jSerialComm.*;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.FileNotFoundException;
@@ -71,6 +72,7 @@ public class Macropadmain {
     private static int preset = 0 ;
 
     private static int getKey(int input) {
+        int fehler = 0 ;
         //https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
         if (preset == 0 ) {
             return switch (input) {
@@ -86,7 +88,7 @@ public class Macropadmain {
                 case 11 -> KeyEvent.VK_F22;
                 case 12 -> KeyEvent.VK_F23;
                 case 13 -> KeyEvent.VK_F24;
-                default -> throw new IllegalStateException("Unexpected value: " + input);
+                default -> fehler = 1 ;
             };
         }else if (preset == 1 ){
             return switch (input) {
@@ -102,10 +104,13 @@ public class Macropadmain {
                 case 11 -> KeyEvent.VK_1;
                 case 12 -> KeyEvent.VK_2;
                 case 13 -> KeyEvent.VK_3;
-                default -> throw new IllegalStateException("Unexpected value: " + input);
+                default -> fehler = 1 ;
             };
         }
 
+        if (fehler == 1 ){
+            JOptionPane.showMessageDialog(null,"bad input " + input);
+        }
         return KeyEvent.VK_DELETE;
     }
 
