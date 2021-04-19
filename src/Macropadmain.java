@@ -39,6 +39,8 @@ public class Macropadmain {
                 Thread.sleep(10000);
             }
         }
+        //exit dialog
+        JOptionPane.showMessageDialog(null , "exited");
     }
 
         //im prinzip main
