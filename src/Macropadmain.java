@@ -5,13 +5,16 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.Scanner;
 
+import static java.lang.Thread.sleep;
+
+@SuppressWarnings("BusyWait")
 public class Macropadmain {
 
-    private static  int preset = 1 ;
+    private static int preset = 1;
 
     public static void main(String[] args) throws InterruptedException {
 
-        while (preset != 0){
+        while (preset != 0) {
             //FileReader fr = new FileReader("config");
 
             SerialPort comPort = null;
@@ -34,17 +37,18 @@ public class Macropadmain {
                 }
 
                 //noinspection BusyWait
-                Thread.sleep(10000);
+                sleep(10000);
             }
         }
         //exit dialog
-        JOptionPane.showMessageDialog(null , "exited");
+        JOptionPane.showMessageDialog(null,"exited");
     }
 
-        //im prinzip main
+    //im prinzip main
     private static void keypress(SerialPort comPort) throws AWTException, InterruptedException {
-        int oldinput = 0 ;
+        int oldinput = 0;
 
+        label:
         while (preset != 0) {
             Scanner s     = new Scanner(comPort.getInputStream());
             Robot   robot = new Robot();
@@ -59,30 +63,41 @@ public class Macropadmain {
             System.out.print(input);
             if (oldinput != input) System.out.println();
 
-            oldinput = input ;
+            oldinput = input;
 
             int key = getKey(input);
 
-            if (key == 0 ){
-                presetswichdialog();
-            }else if (key ==  1){
-                showerrordialog(input);
-                presetswichdialog();
-            }else if (key == 3 ){
-                break;
-            }else{
-               robot.keyPress(key);
-                robot.keyRelease(key);
+
+            switch (key) {
+                //einfach das preset ändern
+                case 0 -> presetswichdialog();
+                //error ist aufgetreten und preset wird geändert
+                case 1 -> {
+                    showerrordialog(input);
+                    presetswichdialog();
+                }
+                //programm wird beendet
+                case 3 -> {
+                    break label;
+                }
+                // music dialog fals praset music ausgewählt wurde TODO Dialog
+                case 2 -> {
+                    JOptionPane.showMessageDialog(null,"wip");
+                }
+                default -> {
+                    robot.keyPress(key);
+                    sleep(100);
+                    robot.keyRelease(key);
+                }
+
             }
 
-            //System.out.println(key);
 
         }
     }
 
 
-
-        //belegung
+    //belegung
     private static int getKey(int input) {
         //https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
         if (preset == 1) {
@@ -99,9 +114,10 @@ public class Macropadmain {
                 case 11 -> KeyEvent.VK_F22;
                 case 12 -> KeyEvent.VK_F23;
                 case 13 -> KeyEvent.VK_F24;
-                default -> 1 ;
+                default -> 1;
             };
-        }else if (preset == 2 ){
+        }
+        else if (preset == 2) {
             return switch (input) {
                 case 2 -> KeyEvent.VK_A;
                 case 3 -> KeyEvent.VK_S;
@@ -111,35 +127,46 @@ public class Macropadmain {
                 case 7 -> KeyEvent.VK_W;
                 case 8 -> KeyEvent.VK_E;
                 case 9 -> KeyEvent.VK_R;
-                case 10 ->  0  ;
+                case 10 -> 0;
                 case 11 -> KeyEvent.VK_1;
                 case 12 -> KeyEvent.VK_2;
                 case 13 -> KeyEvent.VK_DELETE;
-                default -> 1 ;
+                default -> 1;
             };
+        }
+        else if (preset == 3) {
+            return 5;
         }
         return 1;
     }
-        //Dialogue
-    private static void presetswichdialog(){
-        String fk ="Function keys" , wasd = "Wasd etc" , numpad = "numpad(wip)" , exit = "exit";
-        Object[] possibilities = {fk , wasd , numpad , exit};
 
-        String presetInString = (String)JOptionPane.showInputDialog(null,"choose preset","Preset",JOptionPane.QUESTION_MESSAGE,null,possibilities,"1");
-        if (presetInString.equals(exit))    setPreset(0);
-        if (presetInString.equals(fk))      setPreset(1);
-        if (presetInString.equals(wasd))    setPreset(2);
-        if (presetInString.equals(numpad))  setPreset(3);//TODO no preset 3
+    //Dialogue
+    private static void presetswichdialog() {
+        String   fk            = "Function keys", wasd = "Wasd etc", numpad = "numpad(wip)", exit = "exit", music = "music";
+        Object[] possibilities = {fk,wasd,numpad,exit,};
+        try {
+            String presetInString = (String) JOptionPane.showInputDialog(null,"choose preset","Preset",JOptionPane.QUESTION_MESSAGE,null,possibilities,"1");
+            if (presetInString.equals(exit)) setPreset(0);
+            if (presetInString.equals(fk)) setPreset(1);
+            if (presetInString.equals(wasd)) setPreset(2);
+            if (presetInString.equals(music)) setPreset(3);
+            if (presetInString.equals(numpad)) setPreset(4);//TODO no preset 4
+
+        } catch (NullPointerException ignored) {
+        } //Fals der dialog abgebrochen wird einfach ignorieren
+
+
     }
 
     private static void showerrordialog(int input) {
         JOptionPane.showMessageDialog(null,"bad input " + input);
     }
-        //
+
+    //
     private static void waiting(SerialPort comPort) throws InterruptedException {
         while (comPort.bytesAvailable() == 0)
             //noinspection BusyWait
-            Thread.sleep(20);
+            sleep(20);
     }
 
 //    public static int getPreset() {
