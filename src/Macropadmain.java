@@ -12,6 +12,7 @@ public class Macropadmain {
 
     private static int preset = 1;
     public static void main(String[] args) throws InterruptedException {
+        JOptionPane.showMessageDialog(null,"Started");
 
         while (preset != 0) {
             //FileReader fr = new FileReader("config");
@@ -29,7 +30,7 @@ public class Macropadmain {
 
 
             } catch (Throwable e) {
-                System.out.println(e);
+                System.out.println(e.getMessage());
                 System.out.println("a error occurred restarting with 10sec delay ");
                 if (comPort != null && comPort.isOpen()) {
                     comPort.closePort();

@@ -48,6 +48,10 @@ public class Keypress {
                     case 2 -> {
                         JOptionPane.showMessageDialog(null,"wip");
                     }
+                    default -> {
+                        robot.keyPress(key[0]);
+                        robot.keyRelease(key[0]);
+                    }
 
                 }
             }else {
