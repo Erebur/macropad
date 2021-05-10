@@ -11,6 +11,7 @@ import static java.lang.Thread.sleep;
 public class Macropadmain {
 
     private static int preset = 1;
+    private static boolean numlock = Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_NUM_LOCK);
     public static void main(String[] args) throws InterruptedException {
         JOptionPane.showMessageDialog(null,"Started");
 
@@ -30,74 +31,35 @@ public class Macropadmain {
 
 
             } catch (Throwable e) {
-                showerrordialog(String.format("%S \n %S" ,"a error occurred restarting with 10sec delay" , e.toString() ));
-                System.out.printf("%S \n %S%n \n","a error occurred restarting with 10sec delay" , e.toString() );
-                if (comPort != null && comPort.isOpen()) {
-                    comPort.closePort();
-                }
-
-                //noinspection BusyWait
-                sleep(10000);
+                error(comPort, e);
             }
         }
         //exit dialog
         JOptionPane.showMessageDialog(null,"exited");
     }
 
-    //belegung alt
-//    private static int getKey(int input) {
-//        //https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
-//        if (preset == 1) {
-//            return switch (input) {
-//                case 2 -> KeyEvent.VK_F13;
-//                case 3 -> KeyEvent.VK_F14;
-//                case 4 -> KeyEvent.VK_F15;
-//                case 5 -> KeyEvent.VK_F16;
-//                case 6 -> KeyEvent.VK_F17;
-//                case 7 -> KeyEvent.VK_F18;
-//                case 8 -> KeyEvent.VK_F19;
-//                case 9 -> KeyEvent.VK_F20;
-//                case 10 -> 0;
-//                case 11 -> KeyEvent.VK_F22;
-//                case 12 -> KeyEvent.VK_F23;
-//                case 13 -> KeyEvent.VK_F24;
-//                default -> 1;
-//            };
-//        }
-//        else if (preset == 2) {
-//            return switch (input) {
-//                case 2 -> KeyEvent.VK_A;
-//                case 3 -> KeyEvent.VK_S;
-//                case 4 -> KeyEvent.VK_D;
-//                case 5 -> KeyEvent.VK_F;
-//                case 6 -> KeyEvent.VK_Q;
-//                case 7 -> KeyEvent.VK_W;
-//                case 8 -> KeyEvent.VK_E;
-//                case 9 -> KeyEvent.VK_R;
-//                case 10 -> 0;
-//                case 11 -> KeyEvent.VK_1;
-//                case 12 -> KeyEvent.VK_2;
-//                case 13 -> KeyEvent.VK_DELETE;
-//                default -> 1;
-//            };
-//        }
-//        else if (preset == 3) {
-//            return 5;
-//        }
-//        return 1;
-//    }
+    private static void error(SerialPort comPort, Throwable e) throws InterruptedException {
+        showerrordialog(String.format("%S \n %S" ,"a error occurred restarting with 10sec delay" , e.toString() ));
+        System.out.printf("%S \n %S%n \n","a error occurred restarting with 10sec delay" , e.toString() );
+        if (comPort != null && comPort.isOpen()) {
+            comPort.closePort();
+        }
+        sleep(10000);
+    }
 
-    //Dialogue
+
+    //Dialoge
     public static void presetswichdialog() {
-        String   fk            = "Function keys", wasd = "Wasd etc", numpad = "numpad(wip)", exit = "exit(wip)", music = "music";
+        String   fk            = "Function keys", wasd = "Wasd etc", numpad = "numpad", exit = "exit", music = "music";
         Object[] possibilities = {fk,wasd,numpad,music,exit};
         try {
             String presetInString = (String) JOptionPane.showInputDialog(null,"choose preset","Preset",JOptionPane.QUESTION_MESSAGE,null,possibilities,"1");
-            if (presetInString.equals(exit)) setPreset(0);
-            if (presetInString.equals(fk)) setPreset(1);
-            if (presetInString.equals(wasd)) setPreset(2);
-            if (presetInString.equals(music)) setPreset(3);
-            if (presetInString.equals(numpad)) setPreset(4);//TODO no preset 4
+            if (presetInString.equals(exit))    setPreset(0);
+            if (presetInString.equals(fk))      setPreset(1);
+            if (presetInString.equals(wasd))    setPreset(2);
+            if (presetInString.equals(numpad))  setPreset(3);
+            //numpad kriegt 3,4
+            if (presetInString.equals(music))   setPreset(5);
 
         } catch (NullPointerException ignored) {
         } //Falls der dialog abgebrochen wird einfach ignorieren
@@ -109,20 +71,39 @@ public class Macropadmain {
         JOptionPane.showMessageDialog(null,message);
     }
 
-    //
     public static void waiting(SerialPort comPort) throws InterruptedException {
         while (comPort.bytesAvailable() == 0)
             //noinspection BusyWait
             sleep(20);
     }
 
-//    public static int getPreset() {
-//        return preset;
-//    }
+    public static void testnumlock(boolean Konsolenausgabe) {
+        //wenn numlock an dann normal nummern sonst anderes zeug
+
+        if (getNumlockOn()){
+            Macropadmain.setPreset(3, Konsolenausgabe);
+        }else {
+            Macropadmain.setPreset(4 , Konsolenausgabe);
+        }
+    }
+
+    public static boolean getNumlockOn() {
+        return numlock;
+    }
+    public static void switchnumlock() {
+        numlock = !getNumlockOn();
+
+
+    }
 
     public static void setPreset(int preset) {
+        setPreset(preset , true);
+    }
+    public static void setPreset(int preset , boolean Konsolenausgabe) {
         Macropadmain.preset = preset;
-        System.out.printf("\npreset=%d", getPreset());
+        if (Konsolenausgabe){
+            System.out.printf("\npreset=%d", getPreset());
+        }
     }
 
     public static int getPreset() {

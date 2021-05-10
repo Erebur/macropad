@@ -1,10 +1,9 @@
 import com.fazecast.jSerialComm.SerialPort;
 
-import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.util.Scanner;
 
-import static java.lang.Thread.sleep;
 
 public class Keypress {
     //im prinzip main
@@ -31,13 +30,18 @@ public class Keypress {
             int[] key = Presets.getKey(input);
 
             if (key.length == 1 ){
-                switch (key[0]) {
-                    //einfach das preset ändern
-                    case 0 -> Macropadmain.presetswichdialog();
-                    default -> {
-                        robot.keyPress(key[0]);
-                        robot.keyRelease(key[0]);
-                    }
+                //einfach das preset ändern
+                switch (key[ 0 ]) {
+                    case 0:
+                        Macropadmain.presetswichdialog();
+                        break;
+                    //cases with a key pressed
+                    case KeyEvent.VK_NUM_LOCK:
+                        Macropadmain.switchnumlock();
+                    default:
+                        robot.keyPress(key[ 0 ]);
+                        robot.keyRelease(key[ 0 ]);
+                        break;
                 }
             }else {
                 //drückt alle tasten

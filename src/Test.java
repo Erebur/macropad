@@ -6,18 +6,22 @@ import java.security.Key;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Test {
-    public static final int VK_RCONTROL                 = 0xA3;
+import static java.lang.Thread.sleep;
 
-    public static void main(String[] args) throws AWTException {
+public class Test {
+    public static void main(String[] args) throws AWTException, InterruptedException {
        //(KeyEvent.VK_F13)  (KeyEvent.VK_R);}});
         Robot robot = new Robot();
-        var k1 = KeyEvent.VK_CONTROL ;
-        var k2 = KeyEvent.VK_PAGE_DOWN ;
-        robot.keyPress(k1);
-        robot.keyPress(k2);
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+//        toolkit.setLockingKeyState(KeyEvent.VK_NUM_LOCK , false);
+        System.out.println(toolkit.getLockingKeyState(KeyEvent.VK_NUM_LOCK));
 
-        robot.keyRelease(k1);
-        robot.keyRelease(k2);
+        robot.keyPress(KeyEvent.VK_NUM_LOCK);
+        robot.keyRelease(KeyEvent.VK_NUM_LOCK);
+
+        sleep(3000);
+
+        toolkit.sync();
+        System.out.println(toolkit.getLockingKeyState(KeyEvent.VK_NUM_LOCK));
     }
 }

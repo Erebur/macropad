@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class presetswich extends JFrame {
@@ -8,8 +9,8 @@ public class presetswich extends JFrame {
         setSize(500, 500);
 
         //JTable
-        HashMap<Integer , Integer> preset =Presets.getActivePreset();
-        String [][] inhalt = new String[2][preset.size()] ;
+        HashMap<Integer , ArrayList<Integer>> preset = Presets.getActivePreset();
+        String [][]                           inhalt = new String[2][preset.size()] ;
         for (int i = 2; i < inhalt[0].length; i++) {
             inhalt[0][i] = String.valueOf(i);
             inhalt[1][i] = String.valueOf(preset.get(i));
