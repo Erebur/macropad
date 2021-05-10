@@ -11,8 +11,8 @@ public class Presets {
 
 
     //https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
-    private static ArrayList<HashMap<Integer, Integer>> presets = new ArrayList<>();
-    private static ArrayList<HashMap<Integer, ArrayList<Integer>>> presetsnew = new ArrayList<>();
+    private static final ArrayList<HashMap<Integer, Integer>> presets = new ArrayList<>();
+    private static final ArrayList<HashMap<Integer, ArrayList<Integer>>> presetsnew = new ArrayList<>();
 
     static {
         //OLD

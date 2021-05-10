@@ -30,8 +30,8 @@ public class Macropadmain {
 
 
             } catch (Throwable e) {
-                System.out.println(e.getMessage());
-                System.out.println("a error occurred restarting with 10sec delay ");
+                showerrordialog(String.format("%S \n %S" ,"a error occurred restarting with 10sec delay" , e.toString() ));
+                System.out.printf("%S \n %S%n \n","a error occurred restarting with 10sec delay" , e.toString() );
                 if (comPort != null && comPort.isOpen()) {
                     comPort.closePort();
                 }
@@ -89,7 +89,7 @@ public class Macropadmain {
 
     //Dialogue
     public static void presetswichdialog() {
-        String   fk            = "Function keys", wasd = "Wasd etc", numpad = "numpad(wip)", exit = "exit", music = "music";
+        String   fk            = "Function keys", wasd = "Wasd etc", numpad = "numpad(wip)", exit = "exit(wip)", music = "music";
         Object[] possibilities = {fk,wasd,numpad,music,exit};
         try {
             String presetInString = (String) JOptionPane.showInputDialog(null,"choose preset","Preset",JOptionPane.QUESTION_MESSAGE,null,possibilities,"1");
@@ -100,13 +100,13 @@ public class Macropadmain {
             if (presetInString.equals(numpad)) setPreset(4);//TODO no preset 4
 
         } catch (NullPointerException ignored) {
-        } //Fals der dialog abgebrochen wird einfach ignorieren
+        } //Falls der dialog abgebrochen wird einfach ignorieren
 
 
     }
 
-    public static void showerrordialog(int input) {
-        JOptionPane.showMessageDialog(null,"bad input " + input);
+    public static void showerrordialog(String message) {
+        JOptionPane.showMessageDialog(null,message);
     }
 
     //
@@ -122,7 +122,7 @@ public class Macropadmain {
 
     public static void setPreset(int preset) {
         Macropadmain.preset = preset;
-        System.out.printf("preset = %d%n", getPreset());
+        System.out.printf("\npreset=%d", getPreset());
     }
 
     public static int getPreset() {
