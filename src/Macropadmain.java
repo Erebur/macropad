@@ -1,9 +1,8 @@
-import com.fazecast.jSerialComm.*;
+import com.fazecast.jSerialComm.SerialPort;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.util.Scanner;
 
 import static java.lang.Thread.sleep;
 
@@ -40,7 +39,7 @@ public class Macropadmain {
 
     private static void error(SerialPort comPort, Throwable e) throws InterruptedException {
         showerrordialog(String.format("%S \n %S" ,"a error occurred restarting with 10sec delay" , e.toString() ));
-        System.out.printf("%S \n %S%n \n","a error occurred restarting with 10sec delay" , e.toString() );
+        System.out.printf("%S \n %S%n \n","a error occurred restarting with 10sec delay" , e);
         if (comPort != null && comPort.isOpen()) {
             comPort.closePort();
         }

@@ -3,11 +3,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Presets {
-    public static final int VK_RCONTROL                 = 0xA3;
-    public static final int VK_VOLUME_UP                = 0xAF;
-    public static final int VK_VOLUME_DOWN              = 0xAE;
-    public static final int VK_MEDIA_NEXT_TRACK         = 0xB0;
-    public static final int VK_MEDIA_PREV_TRACK         = 0xB1;
+
 
 
     //https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
