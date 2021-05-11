@@ -39,7 +39,7 @@ public class Macropadmain {
 
     private static void error(SerialPort comPort, Throwable e) throws InterruptedException {
         showerrordialog(String.format("%S \n %S" ,"a error occurred restarting with 10sec delay" , e.toString() ));
-        System.out.printf("%S \n %S%n \n","a error occurred restarting with 10sec delay" , e);
+        System.out.printf("%S \n %S%n \n","a error occurred restarting with 10sec delay" , e.getCause());
         if (comPort != null && comPort.isOpen()) {
             comPort.closePort();
         }
@@ -71,9 +71,11 @@ public class Macropadmain {
     }
 
     public static void waiting(SerialPort comPort) throws InterruptedException {
-        while (comPort.bytesAvailable() == 0)
+        while (comPort.bytesAvailable() == 0){
             //noinspection BusyWait
             sleep(20);
+        }
+
     }
 
     public static void testnumlock(boolean Konsolenausgabe) {

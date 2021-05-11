@@ -2,14 +2,17 @@ import com.fazecast.jSerialComm.SerialPort;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.Scanner;
+
+import static java.lang.Thread.sleep;
 
 
 public class Keypress {
     //im prinzip main
     public static void keypress(SerialPort comPort) throws AWTException, InterruptedException {
-        int oldInput = 0;
-        int oldInputausgabe = 0;
+        ArrayList<Integer> oldInput        = new ArrayList<>();
+        int                oldInputausgabe = 0;
 
         while (Macropadmain.getPreset() != 0) {
             Scanner s     = new Scanner(comPort.getInputStream());
@@ -27,10 +30,60 @@ public class Keypress {
             oldInputausgabe = input;
             System.out.print(input);
 
-            //sucht sich den Hexcode aus den presets
-            int[] key = Presets.getKey(input);
 
             //TODO its a mess pls fix --> mit button halten pls
+            //schaut ob die taste gedrückt oder losgelassen wird
+            boolean matched = false;
+            if (!oldInput.isEmpty()){
+                for (int i = 0; i < oldInput.size(); i++) {
+                    if (input == oldInput.get(i)) {
+                        int[] key = Presets.getKey(oldInput.get(i));
+                        //lässt alle tasten los( bei mehreren gehaltenen gleichzeitig)
+                        for (int j : key) {
+                            robot.keyRelease(j);
+                        }
+                        matched = true ;
+                        oldInput.remove(i);
+                    }
+                }
+            }
+
+
+            if (!matched){
+                oldInput.add(input);
+                int[] key = Presets.getKey(input);
+                //sucht sich den Hexcode aus den presets
+
+                switch (key[ 0 ]) {
+                    case 0:
+                        Macropadmain.presetswichdialog();
+                        break;
+                    //cases with a key pressed
+                    case KeyEvent.VK_NUM_LOCK:
+                        Macropadmain.switchnumlock();
+                    default:
+                        //drückt alle tasten
+                        for (int j : key) {
+                            robot.keyPress(j);
+                        }
+                        break;
+                }
+
+                while (comPort.bytesAvailable() == 0){
+                    for (int j : key) {
+                        robot.keyPress(j);
+                    }
+                    //noinspection BusyWait
+                    sleep(200);
+                    for (int j : key) {
+                        robot.keyPress(j);
+                    }
+                }
+
+            }
+
+
+/*
             if (key.length == 1 ){
                 //einfach das preset ändern
                 switch (key[ 0 ]) {
@@ -74,7 +127,7 @@ public class Keypress {
 
 
             }
-
+*/
 
 
         }
