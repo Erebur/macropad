@@ -44,8 +44,8 @@ public class Keypress {
                             for (int j : key) {
                                 robot.keyRelease(j);
                             }
-                            oldInput.remove(i);
                         }
+                        oldInput.remove(i);
                         matched = true;
                     }
                 }

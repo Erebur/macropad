@@ -51,8 +51,8 @@ public class Macropadmain {
     //Dialoge
     public static void presetswichdialog() {
         if (isPresetswitchdialog()){
-            String   fk            = "Function keys", wasd = "Wasd etc", numpad = "numpad", exit = "exit", music = "music";
-            Object[] possibilities = {fk,wasd,numpad,music,exit};
+            String   fk            = "Function keys", wasd = "Wasd etc", numpad = "numpad", exit = "exit", music = "music", fkm = "Function keys but music";
+            Object[] possibilities = {fk,fkm,wasd,numpad,music,exit};
             try {
                 String presetInString = (String) JOptionPane.showInputDialog(null,"choose preset","Preset",JOptionPane.QUESTION_MESSAGE,null,possibilities,"1");
                 if (presetInString.equals(exit))    setPreset(0);
@@ -61,6 +61,7 @@ public class Macropadmain {
                 if (presetInString.equals(numpad))  setPreset(3);
                 //numpad kriegt 3,4
                 if (presetInString.equals(music))   setPreset(5);
+                if (presetInString.equals(fkm))     setPreset(6);
             } catch (NullPointerException ignored) {
                 //Falls der dialog abgebrochen wird einfach ignorieren
             }
@@ -71,8 +72,6 @@ public class Macropadmain {
                 setPreset(getPreset() + 1 );
             }
         }
-
-
 
 
 
