@@ -57,7 +57,7 @@ public class Presets {
                 put(6 , new ArrayList<>(){{add(KeyEvent.VK_NUMPAD4);}});
                 put(7 , new ArrayList<>(){{add(KeyEvent.VK_NUMPAD5);}});
                 put(8 , new ArrayList<>(){{add(KeyEvent.VK_NUMPAD6);}});
-                put(9 , new ArrayList<>(){{add(KeyEvent.VK_ENTER);}});
+                put(9 , new ArrayList<>(){{add(0);}});
                 //reihe 3
                 put(10 , new ArrayList<>(){{add(KeyEvent.VK_NUMPAD7);}});
                 put(11 , new ArrayList<>(){{add(KeyEvent.VK_NUMPAD8);}});
@@ -79,6 +79,8 @@ public class Presets {
                 put(11 , new ArrayList<>(){{add(KeyEvent.VK_DELETE);}});
                 put(12 , new ArrayList<>(){{add(KeyEvent.VK_ENTER);}});
                 put(13 , new ArrayList<>(){{add(KeyEvent.VK_NUM_LOCK);}});}});
+        //preset 5 music
+
     }
 
     public static int[] getKey(int input){
@@ -97,6 +99,9 @@ public class Presets {
 
     public static HashMap<Integer, ArrayList<Integer>> getActivePreset(){
         return presets.get(Macropadmain.getPreset());
+    }
+    public static int  getgesamtpresets(){
+        return presets.size();
     }
 
 }

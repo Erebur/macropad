@@ -10,6 +10,7 @@ import static java.lang.Thread.sleep;
 public class Macropadmain {
 
     private static int preset = 1;
+    private static boolean presetswitchdialog  = true ;
     private static boolean numlock = Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_NUM_LOCK);
     public static void main(String[] args) throws InterruptedException {
         JOptionPane.showMessageDialog(null,"Started");
@@ -49,19 +50,32 @@ public class Macropadmain {
 
     //Dialoge
     public static void presetswichdialog() {
-        String   fk            = "Function keys", wasd = "Wasd etc", numpad = "numpad", exit = "exit", music = "music";
-        Object[] possibilities = {fk,wasd,numpad,music,exit};
-        try {
-            String presetInString = (String) JOptionPane.showInputDialog(null,"choose preset","Preset",JOptionPane.QUESTION_MESSAGE,null,possibilities,"1");
-            if (presetInString.equals(exit))    setPreset(0);
-            if (presetInString.equals(fk))      setPreset(1);
-            if (presetInString.equals(wasd))    setPreset(2);
-            if (presetInString.equals(numpad))  setPreset(3);
-            //numpad kriegt 3,4
-            if (presetInString.equals(music))   setPreset(5);
+        if (isPresetswitchdialog()){
+            String   fk            = "Function keys", wasd = "Wasd etc", numpad = "numpad", exit = "exit", music = "music";
+            Object[] possibilities = {fk,wasd,numpad,music,exit};
+            try {
+                String presetInString = (String) JOptionPane.showInputDialog(null,"choose preset","Preset",JOptionPane.QUESTION_MESSAGE,null,possibilities,"1");
+                if (presetInString.equals(exit))    setPreset(0);
+                if (presetInString.equals(fk))      setPreset(1);
+                if (presetInString.equals(wasd))    setPreset(2);
+                if (presetInString.equals(numpad))  setPreset(3);
+                //numpad kriegt 3,4
+                if (presetInString.equals(music))   setPreset(5);
+            } catch (NullPointerException ignored) {
+                //Falls der dialog abgebrochen wird einfach ignorieren
+            }
+        }else {
+            if (getPreset() == Presets.getgesamtpresets()){
+                setPreset(1);
+            }else{
+                setPreset(getPreset() + 1 );
+            }
+        }
 
-        } catch (NullPointerException ignored) {
-        } //Falls der dialog abgebrochen wird einfach ignorieren
+
+
+
+
 
 
     }
@@ -75,7 +89,6 @@ public class Macropadmain {
             //noinspection BusyWait
             sleep(20);
         }
-
     }
 
     public static void testnumlock(boolean Konsolenausgabe) {
@@ -109,5 +122,13 @@ public class Macropadmain {
 
     public static int getPreset() {
         return preset;
+    }
+
+    public static boolean isPresetswitchdialog() {
+        return presetswitchdialog;
+    }
+
+    public static void setPresetswitchdialog(boolean presetswitchdialog) {
+        Macropadmain.presetswitchdialog = presetswitchdialog;
     }
 }
