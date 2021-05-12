@@ -40,10 +40,9 @@ public class Keypress {
                     if (input == oldInput.get(i)) {
                         int[] key = Presets.getKey(oldInput.get(i));
                         if (key[0] != 0 ) {
-                            //lässt alle tasten los( bei mehreren gehaltenen gleichzeitig)
-                            for (int j : key) {
-                                robot.keyRelease(j);
-                            }
+//                            sleep(200);
+//                            drückt alle tasten
+//                            press(key);
                         }
                         oldInput.remove(i);
                         matched = true;
@@ -66,29 +65,22 @@ public class Keypress {
                         Macropadmain.switchnumlock();
                     default:
                         //drückt alle tasten
-                        for (int j : key) {
-                            robot.keyPress(j);
-                        }
+                        press(key);
                         break;
                 }
-
-//                while (comPort.bytesAvailable() == 0){
-//                    //noinspection BusyWait
-//                    sleep(200);
-//                    for (int j : key) {
-//                        robot.keyRelease(j);
-//                    }
-//                    for (int j : key) {
-//                        robot.keyPress(j);
-//                    }
-//                }
-
             }
+        }
+    }
 
-
-
-
-
+    private static void press(int[] key) throws AWTException {
+        Robot robot = new Robot();
+        //drückt alle tasten
+        for (int j : key) {
+            robot.keyPress(j);
+        }
+        //lässt alle tasten los
+        for (int j : key) {
+            robot.keyRelease(j);
         }
     }
 
