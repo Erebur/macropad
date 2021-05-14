@@ -3,15 +3,19 @@ import com.fazecast.jSerialComm.SerialPort;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.io.*;
+import java.util.Scanner;
 
 import static java.lang.Thread.sleep;
 
 @SuppressWarnings("BusyWait")
 public class Macropadmain {
 
-    private static int preset = 1;
+    private static final File config = new File("config");
+    private static int preset = initializePreset();
     private static boolean presetswitchdialog  = true ;
     private static boolean numlock = Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_NUM_LOCK);
+
     public static void main(String[] args) throws InterruptedException {
         JOptionPane.showMessageDialog(null,"Started");
 
@@ -103,6 +107,7 @@ public class Macropadmain {
     public static boolean getNumlockOn() {
         return numlock;
     }
+
     public static void switchnumlock() {
         numlock = !getNumlockOn();
 
@@ -112,8 +117,15 @@ public class Macropadmain {
     public static void setPreset(int preset) {
         setPreset(preset , true);
     }
+
     public static void setPreset(int preset , boolean Konsolenausgabe) {
-        Macropadmain.preset = preset;
+        if (preset == 0) {
+            Macropadmain.preset = preset;
+        }else {
+            Macropadmain.preset = preset;
+            writePreset(preset);
+        }
+
         if (Konsolenausgabe){
             System.out.printf("\npreset=%d", getPreset());
         }
@@ -127,7 +139,50 @@ public class Macropadmain {
         return presetswitchdialog;
     }
 
-    public static void setPresetswitchdialog(boolean presetswitchdialog) {
+    public static void setPresetwitchdialog(boolean presetswitchdialog) {
         Macropadmain.presetswitchdialog = presetswitchdialog;
     }
+
+    //zwei methoden zum speichern des presets in einer config
+    public static int initializePreset() {
+        var trennzeichen = ":";
+        FileReader fr;
+        int result = 1 ;
+        try {
+            fr = new FileReader(config);
+            Scanner configScanner = new Scanner(fr);
+            var tmp = configScanner.nextLine();
+            fr.close();
+            configScanner.close();
+            result =  Integer.parseInt(tmp.substring(tmp.indexOf(trennzeichen) + 1 ));
+        } catch (Exception ignored) {
+        }
+
+        if (result == 0){
+            result = 1 ;
+        }
+        return result ;
+    }
+
+    public static void writePreset(int preset){
+        var trennzeichen = ":";
+        FileReader fr;
+        try {
+            fr = new FileReader(config);
+            Scanner configScanner = new Scanner(fr);
+            var tmp = configScanner.nextLine();
+
+            fr.close();
+            configScanner.close();
+            tmp = tmp.substring(0 ,tmp.indexOf(trennzeichen) + 1 ) + preset;
+
+            PrintWriter pw = new PrintWriter(new FileWriter(config));
+            pw.write(tmp);
+            pw.close();
+
+        } catch (IOException ignored) {
+        }
+    }
+
+
 }
