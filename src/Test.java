@@ -11,8 +11,6 @@ import static java.lang.Thread.sleep;
 
 public class Test {
     public static void main(String[] args){
-        System.out.println(Macropadmain.initializePreset());
-        Macropadmain.writePreset(1);
-        System.out.println(Macropadmain.initializePreset());
+
     }
 }

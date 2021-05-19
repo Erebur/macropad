@@ -4,8 +4,6 @@ import java.util.HashMap;
 
 public class Presets {
 
-
-
     //https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
     private static final ArrayList<HashMap<Integer, ArrayList<Integer>>> presets = new ArrayList<>();
 

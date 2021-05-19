@@ -5,45 +5,39 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import static java.lang.Thread.sleep;
-
 
 public class Keypress {
     //im prinzip main
     public static void keypress(SerialPort comPort) throws AWTException, InterruptedException {
         ArrayList<Integer> oldInput        = new ArrayList<>();
-        int                oldInputausgabe = 0;
+        int                oldInputAusgabe = 0;
 
         while (Macropadmain.getPreset() != 0) {
             Scanner s     = new Scanner(comPort.getInputStream());
-            Robot   robot = new Robot();
 
             //waits for input
             Macropadmain.waiting(comPort);
 
             //saves input in var
-            var input = Integer.parseInt(s.nextLine());
+            var input = aufzahltesten(s);
+
 
             //input in console ausgeben
 
-            if (oldInputausgabe != input) System.out.println();
-            oldInputausgabe = input;
-            System.out.print(input);
+            //noinspection ConstantConditions
+            if (true) {
+                if (oldInputAusgabe != input) System.out.println();
+                oldInputAusgabe = input;
+                System.out.print(input);
+            }
 
-
-            //TODO its a mess pls fix --> mit button halten pls
             //schaut ob die taste gedrückt oder losgelassen wird
 
             boolean matched = false;
             if (!oldInput.isEmpty()){
                 for (int i = 0; i < oldInput.size(); i++) {
                     if (input == oldInput.get(i)) {
-                        int[] key = Presets.getKey(oldInput.get(i));
-                        if (key[0] != 0 ) {
-//                            sleep(200);
-//                            drückt alle tasten
-//                            press(key);
-                        }
+//                        int[] key = Presets.getKey(oldInput.get(i));
                         oldInput.remove(i);
                         matched = true;
                     }
@@ -70,6 +64,23 @@ public class Keypress {
                 }
             }
         }
+    }
+
+    private static int aufzahltesten(Scanner s) {
+        String eingabe = s.nextLine() ;
+        int    input = 0 ;
+        //da es manchmal(Random lol) falsche eingaben gibt braucht man  fehlerkorrektur
+
+        for (int i = 0; i < eingabe.length(); i++) {
+            try {
+                eingabe = eingabe.substring(0, eingabe.length() - i);
+                input   = Integer.parseInt(eingabe);
+                break;
+            }catch (Exception ignored){
+            }
+
+        }
+        return input;
     }
 
     private static void press(int[] key) throws AWTException {
