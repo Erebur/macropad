@@ -12,8 +12,8 @@ import static java.lang.Thread.sleep;
 @SuppressWarnings("BusyWait")
 public class Macropadmain {
 
-    //0 aus // 1 console // 2 pop up
-    private static final int errormessage = 1;
+    //0 aus // 1 console // 2 pop up // 3 (1 + 2)
+    private static final int errormessage = 0;
     //der Pfad der config datei die zum speichern des presets genutzt wird
     private static final File config = new File("C:\\Users\\simon\\OneDrive\\Dokumente\\Programmieren\\eigengebrauch\\macropad\\config");
     //das preset wird aus dieser datei gesucht
@@ -71,10 +71,14 @@ public class Macropadmain {
 
     @SuppressWarnings("ConstantConditions")
     private static void error(SerialPort comPort, Throwable e) throws InterruptedException {
-        //0 aus // 1 console // 2 pop up
+        //0 aus // 1 console // 2 pop up // 3 (1 + 2)
         switch (errormessage){
             case 1 -> System.out.printf("%S \n %S%n \n", "a error occurred restarting with 10sec delay", e.getCause());
             case 2 -> showerrordialog(String.format("%S \n %S", "a error occurred restarting with 10sec delay", e.toString()));
+            case 3 -> {
+                System.out.printf("%S \n %S%n \n", "a error occurred restarting with 10sec delay", e.getCause());
+                showerrordialog(String.format("%S \n %S", "a error occurred restarting with 10sec delay", e.toString()));
+            }
         }
         if (comPort != null && comPort.isOpen()) {
             comPort.closePort();
