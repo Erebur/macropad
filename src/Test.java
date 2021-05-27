@@ -1,16 +1,10 @@
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.io.FileNotFoundException;
-import java.security.Key;
-import java.util.ArrayList;
-import java.util.Scanner;
+import com.fazecast.jSerialComm.SerialPort;
 
-import static java.lang.Thread.sleep;
+import java.awt.*;
+import java.util.Arrays;
 
 public class Test {
-    public static void main(String[] args){
-
+    public static void main(String[] args) throws InterruptedException, AWTException {
+        System.out.println(Arrays.toString(SerialPort.getCommPorts()));
     }
 }

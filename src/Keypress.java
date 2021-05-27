@@ -21,7 +21,6 @@ public class Keypress {
             //saves input in var
             var input = aufzahltesten(s);
 
-
             //input in console ausgeben
 
             //noinspection ConstantConditions

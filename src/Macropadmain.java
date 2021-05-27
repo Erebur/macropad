@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.*;
+import java.util.Arrays;
 import java.util.Scanner;
 
 import static java.lang.Thread.sleep;
@@ -11,35 +12,61 @@ import static java.lang.Thread.sleep;
 @SuppressWarnings("BusyWait")
 public class Macropadmain {
 
-    private static final File config = new File("config");
+    //0 aus // 1 console // 2 pop up
+    private static final int errormessage = 0 ;
+    //der Pfad der config datei die zum speichern des presets genutzt wird
+    private static final File config = new File("C:\\Users\\simon\\OneDrive\\Dokumente\\Programmieren\\eigengebrauch\\macropad\\config");
+    //das preset wird aus dieser datei gesucht
     private static int preset = initializePreset();
-    private static boolean presetswitchdialog  = true ;
-    private static boolean numlock = Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_NUM_LOCK);
+    private static boolean presetSwitchDialog  = true ;
+    //speichert den status des numlocks --> nur am anfang des Programms aktuell --> fängt keine änderungen ab
+    private static boolean numLock = Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_NUM_LOCK);
+    private static int port;
+    private static boolean exit = false ;
 
     public static void main(String[] args) throws InterruptedException {
-        JOptionPane.showMessageDialog(null,"Started");
+        //usereingabe des Ports
+        // bei falscher eingabe wartet das programm ewig auf eingabe durch serial Port bekommt aber nie etwas -> das programm macht nicht und man kann nicht beenden (was ungünstig ist lol)
+        //TODO mit arduino den Port übergeben und automatisch richtig wählen
+        portsuchen();
 
-        while (preset != 0) {
-            //FileReader fr = new FileReader("config");
+        while (!exit) {
 
             SerialPort comPort = null;
             //serial port reader
             try {
                 System.out.println("Started");
-                //reads the second (first real) open port
-                comPort = SerialPort.getCommPorts()[ 1 ];
+                //öffnet den ausgewählten port
+                comPort = SerialPort.getCommPorts()[ port ];
                 comPort.openPort();
 
-                //finds and presses keys
+                //drückt tasten lol
                 Keypress.keypress(comPort);
 
 
             } catch (Throwable e) {
                 error(comPort, e);
+                //wär doch ungünstig wenn man errors(mit pop ups) ohne ende bekommen würde und man nicht abbrechen kann lol
+                presetswichdialog();
             }
         }
         //exit dialog
         JOptionPane.showMessageDialog(null,"exited");
+    }
+
+    private static void portsuchen() {
+        boolean error = false ;
+        do {
+            try {
+                port = Integer.parseInt(JOptionPane.showInputDialog(null , Arrays.toString(SerialPort.getCommPorts()) ));
+                SerialPort comPort = SerialPort.getCommPorts()[ port ];
+                comPort.openPort();
+                error = true ;
+                System.out.printf("Started with port %d and preset %d \n" , port  ,preset);
+                comPort.closePort();
+            }catch (Exception ignored){
+            }
+        }while (!error);
     }
 
     private static void error(SerialPort comPort, Throwable e) throws InterruptedException {
@@ -55,17 +82,21 @@ public class Macropadmain {
     //Dialoge
     public static void presetswichdialog() {
         if (isPresetswitchdialog()){
-            String   fk            = "Function keys", wasd = "Wasd etc", numpad = "numpad", exit = "exit", music = "music", fkm = "Function keys but music";
-            Object[] possibilities = {fk,fkm,wasd,numpad,music,exit};
+            String   fk            = "Function keys", wasd = "Wasd etc", numpad = "numpad", exit = "exit", music = "music", fkm = "Function keys but music" , portSwitch = "PortSwitch";
+            Object[] possibilities = {fk,fkm,wasd,numpad,music,portSwitch, exit};
             try {
                 String presetInString = (String) JOptionPane.showInputDialog(null,"choose preset","Preset",JOptionPane.QUESTION_MESSAGE,null,possibilities,"1");
-                if (presetInString.equals(exit))    setPreset(0);
-                if (presetInString.equals(fk))      setPreset(1);
-                if (presetInString.equals(wasd))    setPreset(2);
-                if (presetInString.equals(numpad))  setPreset(3);
+
+                //TODO da müsste man sich was besseres einfallen lassen lol
+                if (presetInString.equals(exit))        special(0);
+                if (presetInString.equals(fk))          setPreset(1);
+                if (presetInString.equals(wasd))        setPreset(2);
+                if (presetInString.equals(numpad))      setPreset(3);
                 //numpad kriegt 3,4
-                if (presetInString.equals(music))   setPreset(5);
-                if (presetInString.equals(fkm))     setPreset(6);
+                if (presetInString.equals(music))       setPreset(5);
+                if (presetInString.equals(fkm))         setPreset(6);
+                if (presetInString.equals(portSwitch))  special(1);
+
             } catch (NullPointerException ignored) {
                 //Falls der dialog abgebrochen wird einfach ignorieren
             }
@@ -76,11 +107,6 @@ public class Macropadmain {
                 setPreset(getPreset() + 1 );
             }
         }
-
-
-
-
-
     }
 
     public static void showerrordialog(String message) {
@@ -105,13 +131,20 @@ public class Macropadmain {
     }
 
     public static boolean getNumlockOn() {
-        return numlock;
+        return numLock;
     }
 
     public static void switchnumlock() {
-        numlock = !getNumlockOn();
+        numLock = !getNumlockOn();
 
 
+    }
+
+    public static void special(int type){
+        switch (type) {
+            case 0 -> exit = true;
+            case 1 -> portsuchen();
+        }
     }
 
     public static void setPreset(int preset) {
@@ -136,11 +169,11 @@ public class Macropadmain {
     }
 
     public static boolean isPresetswitchdialog() {
-        return presetswitchdialog;
+        return presetSwitchDialog;
     }
 
     public static void setPresetwitchdialog(boolean presetswitchdialog) {
-        Macropadmain.presetswitchdialog = presetswitchdialog;
+        Macropadmain.presetSwitchDialog = presetswitchdialog;
     }
 
     //zwei methoden zum speichern des presets in einer config
