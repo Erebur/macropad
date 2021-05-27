@@ -1,10 +1,12 @@
-import com.fazecast.jSerialComm.SerialPort;
-
 import java.awt.*;
-import java.util.Arrays;
 
 public class Test {
     public static void main(String[] args) throws InterruptedException, AWTException {
-        System.out.println(Arrays.toString(SerialPort.getCommPorts()));
+        String test = "ja";
+        switch (test) {
+            case "ja" -> System.out.println("nö");
+            case "test" -> System.out.println("ja");
+            default -> throw new IllegalStateException("Unexpected value: " + test);
+        }
     }
 }
