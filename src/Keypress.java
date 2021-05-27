@@ -38,6 +38,7 @@ public class Keypress {
                     if (input == oldInput.get(i)) {
 //                        int[] key = Presets.getKey(oldInput.get(i));
                         oldInput.remove(i);
+                        i--;
                         matched = true;
                     }
                 }

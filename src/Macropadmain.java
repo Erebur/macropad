@@ -13,7 +13,7 @@ import static java.lang.Thread.sleep;
 public class Macropadmain {
 
     //0 aus // 1 console // 2 pop up
-    private static final int errormessage = 0;
+    private static final int errormessage = 1;
     //der Pfad der config datei die zum speichern des presets genutzt wird
     private static final File config = new File("C:\\Users\\simon\\OneDrive\\Dokumente\\Programmieren\\eigengebrauch\\macropad\\config");
     //das preset wird aus dieser datei gesucht
@@ -69,12 +69,17 @@ public class Macropadmain {
         } while (!error);
     }
 
+    @SuppressWarnings("ConstantConditions")
     private static void error(SerialPort comPort, Throwable e) throws InterruptedException {
-        showerrordialog(String.format("%S \n %S", "a error occurred restarting with 10sec delay", e.toString()));
-        System.out.printf("%S \n %S%n \n", "a error occurred restarting with 10sec delay", e.getCause());
+        //0 aus // 1 console // 2 pop up
+        switch (errormessage){
+            case 1 -> System.out.printf("%S \n %S%n \n", "a error occurred restarting with 10sec delay", e.getCause());
+            case 2 -> showerrordialog(String.format("%S \n %S", "a error occurred restarting with 10sec delay", e.toString()));
+        }
         if (comPort != null && comPort.isOpen()) {
             comPort.closePort();
         }
+        //10 sec
         sleep(10000);
     }
 
@@ -98,16 +103,7 @@ public class Macropadmain {
                     case "music"        -> setPreset(5);
 
                 }
-//                  //alt
-//
-//                if (presetInString.equals(exit)) special(0);
-//                if (presetInString.equals(fk)) setPreset(1);
-//                if (presetInString.equals(fkm)) setPreset(6);
-//                if (presetInString.equals(wasd)) setPreset(2);
-//                if (presetInString.equals(numpad)) setPreset(3);
-//                //numpad kriegt 3,4
-//                if (presetInString.equals(music)) setPreset(5);
-//                if (presetInString.equals(portSwitch)) special(1);
+
 
             } catch (NullPointerException ignored) {
                 //Falls der dialog abgebrochen wird einfach ignorieren
