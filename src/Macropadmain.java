@@ -13,7 +13,7 @@ import static java.lang.Thread.sleep;
 public class Macropadmain {
 
     //0 aus // 1 console // 2 pop up // 3 (1 + 2)
-    private static final int errormessage = 0;
+    private static final int debugLevel = 1;
     //der Pfad der config datei die zum speichern des presets genutzt wird
     private static final File config = new File("C:\\Users\\simon\\OneDrive\\Dokumente\\Programmieren\\eigengebrauch\\macropad\\config");
     //das preset wird aus dieser datei gesucht
@@ -35,7 +35,7 @@ public class Macropadmain {
             SerialPort comPort = null;
             //serial port reader
             try {
-                System.out.println("Started");
+                error("Started");
                 //öffnet den ausgewählten port
                 comPort = SerialPort.getCommPorts()[ port ];
                 comPort.openPort();
@@ -62,24 +62,16 @@ public class Macropadmain {
                 SerialPort comPort = SerialPort.getCommPorts()[ port ];
                 comPort.openPort();
                 error = true;
-                System.out.printf("Started with port %d and preset %d \n", port, preset);
+                error(String.format("Started with port %d and preset %d", port, preset) );
                 comPort.closePort();
             } catch (Exception ignored) {
             }
         } while (!error);
     }
 
-    @SuppressWarnings("ConstantConditions")
     private static void error(SerialPort comPort, Throwable e) throws InterruptedException {
-        //0 aus // 1 console // 2 pop up // 3 (1 + 2)
-        switch (errormessage){
-            case 1 -> System.out.printf("%S \n %S%n \n", "a error occurred restarting with 10sec delay", e.getCause());
-            case 2 -> showerrordialog(String.format("%S \n %S", "a error occurred restarting with 10sec delay", e.toString()));
-            case 3 -> {
-                System.out.printf("%S \n %S%n \n", "a error occurred restarting with 10sec delay", e.getCause());
-                showerrordialog(String.format("%S \n %S", "a error occurred restarting with 10sec delay", e.toString()));
-            }
-        }
+        error(String.format("%S \n %S", "a error occurred restarting with 10sec delay", e.toString()));
+
         if (comPort != null && comPort.isOpen()) {
             comPort.closePort();
         }
@@ -87,8 +79,29 @@ public class Macropadmain {
         sleep(10000);
     }
 
+    static void error(String errorMessage){
+        error(errorMessage , true);
+    }
 
-    //Dialoge
+    @SuppressWarnings("ConstantConditions")
+    public static void error(String errorMessage , boolean formating){
+        String errorFormated  = errorMessage;
+        if (formating) {
+            errorFormated = String.format("\n %S", errorMessage);
+        }
+        //0 aus // 1 console // 2 pop up // 3 (1 + 2)
+        switch (debugLevel){
+            case 1 -> System.out.print(errorFormated);
+            case 2 -> showerrordialog(errorFormated);
+            case 3 -> {
+                System.out.print(errorFormated);
+                showerrordialog(errorFormated);
+            }
+        }
+    }
+
+
+        //Dialoge
     public static void presetswichdialog() {
         if (isPresetswitchdialog()) {
             String   fk            = "Function keys", wasd = "Wasd etc", numpad = "numpad", exit = "exit", music = "music", fkm = "Function keys but music", portSwitch = "PortSwitch";
@@ -96,16 +109,23 @@ public class Macropadmain {
             try {
                 String presetInString = (String) JOptionPane.showInputDialog(null, "choose preset", "Preset", JOptionPane.QUESTION_MESSAGE, null, possibilities, "1");
 
-                switch (presetInString){
-                    case "exit"         -> special(0);
-                    case "portSwitch"   -> special(1);
-                    case "fk"           -> setPreset(1);
-                    case "fkm"          -> setPreset(6);
-                    case "wasd"         -> setPreset(2);
-                    //numpad kriegt 3,4
-                    case "numpad"       -> setPreset(3);
-                    case "music"        -> setPreset(5);
+                error(presetInString);
 
+                if (presetInString.equals(exit)){
+                    special(0);
+                }else if (presetInString.equals(portSwitch)){
+                    special(1);
+                }else if (presetInString.equals(fk)){
+                    setPreset(1);
+                }else if (presetInString.equals(fkm)){
+                    setPreset(6);
+                }else if (presetInString.equals(wasd)){
+                    setPreset(2);
+                }else if (presetInString.equals(numpad)){
+                    setPreset(3);
+                    //numpad kriegt 3,4
+                }else if (presetInString.equals(music)){
+                    setPreset(5);
                 }
 
 
@@ -151,13 +171,11 @@ public class Macropadmain {
 
     public static void switchnumlock() {
         numLock = !getNumlockOn();
-
-
     }
 
     public static void special(int type) {
         switch (type){
-            case 0 -> exit = true;
+            case 0 -> setExit(true);
             case 1 -> portsuchen();
         }
     }
@@ -172,7 +190,7 @@ public class Macropadmain {
         }
 
         if (Konsolenausgabe) {
-            System.out.printf("\npreset=%d", getPreset());
+            error(String.format("\npreset=%d\n", getPreset()) ,false );
         }
     }
 
@@ -233,4 +251,7 @@ public class Macropadmain {
         }
     }
 
+    public static void setExit(boolean exit) {
+        Macropadmain.exit = exit;
+    }
 }

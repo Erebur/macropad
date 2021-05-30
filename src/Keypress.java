@@ -27,7 +27,7 @@ public class Keypress {
             if (true) {
                 if (oldInputAusgabe != input) System.out.println();
                 oldInputAusgabe = input;
-                System.out.print(input);
+                Macropadmain.error(String.valueOf(input) , false);
             }
 
             //schaut ob die taste gedrückt oder losgelassen wird
