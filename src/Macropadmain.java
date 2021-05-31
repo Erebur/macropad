@@ -6,6 +6,7 @@ import java.awt.event.KeyEvent;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Scanner;
 
 import static java.lang.Thread.sleep;
@@ -17,19 +18,62 @@ public class Macropadmain {
     private static final int debugLevel = 1;
     //der Pfad der config datei die zum speichern des presets genutzt wird
     private static final File config = new File("C:\\Users\\simon\\OneDrive\\Dokumente\\Programmieren\\eigengebrauch\\macropad\\config");
+    private static final char trennzeichen = ':';
+    //key = reihenfolge // String = die bezeichnung // boolean special (oder setPreset) // nummer der aktion
+    public static ArrayList<ArrayList<Object>> presets = new ArrayList<>() {{
+        add(new ArrayList<>() {{
+            add("Function keys");
+            add(false);
+            add(1);
+        }});
+        add(new ArrayList<>() {{
+            add("Function keys but music");
+            add(false);
+            add(6);
+        }});
+        add(new ArrayList<>() {{
+            add("Wasd etc");
+            add(false);
+            add(2);
+        }});
+        add(new ArrayList<>() {{
+            add("numpad");
+            add(false);/*numpad kriegt 3,4*/
+            add(3);
+        }});
+        add(new ArrayList<>() {{
+            add("music");
+            add(false);
+            add(5);
+        }});
+
+        add(new ArrayList<>() {{
+            add("exit");
+            add(true);
+            add(0);
+        }});
+        add(new ArrayList<>() {{
+            add("PortSwitch");
+            add(true);
+            add(1);
+        }});
+    }};
     //das preset wird aus dieser datei gesucht
     private static int preset = initializePreset();
+    private static int port = initializePort();
     private static boolean presetSwitchDialog = true;
     //speichert den status des numlocks --> nur am anfang des Programms aktuell --> fängt keine änderungen ab
     private static boolean numLock = Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_NUM_LOCK);
-    private static int port;
     private static boolean exit = false;
 
     public static void main(String[] args) throws InterruptedException {
         //usereingabe des Ports
         // bei falscher eingabe wartet das programm ewig auf eingabe durch serial Port bekommt aber nie etwas -> das programm macht nicht und man kann nicht beenden (was ungünstig ist lol)
         //TODO mit arduino den Port übergeben und automatisch richtig wählen
-        portsuchen();
+        if (port == -1){
+            portsuchen();
+        }
+
 
         while (!exit) {
 
@@ -55,7 +99,7 @@ public class Macropadmain {
         JOptionPane.showMessageDialog(null, "exited");
     }
 
-    private static void portsuchen() {
+    public static void portsuchen() {
         boolean error = false;
         do {
             try {
@@ -63,14 +107,16 @@ public class Macropadmain {
                 SerialPort comPort = SerialPort.getCommPorts()[ port ];
                 comPort.openPort();
                 error = true;
-                error(String.format("Started with port %d and preset %d", port, preset) );
+                error(String.format("Started with port %d and preset %d", port, preset));
                 comPort.closePort();
             } catch (Exception ignored) {
-                port = 1 ;
+                port = 1;
 //                error = true ;
             }
         } while (!error);
+        writePort(port);
     }
+
 
     private static void error(SerialPort comPort, Throwable e) throws InterruptedException {
         error(String.format("%S \n %S", "a error occurred restarting with 10sec delay", e.toString()));
@@ -82,13 +128,13 @@ public class Macropadmain {
         sleep(10000);
     }
 
-    static void error(String errorMessage){
-        error(errorMessage , true);
+    static void error(String errorMessage) {
+        error(errorMessage, true);
     }
 
     @SuppressWarnings("ConstantConditions")
-    public static void error(String errorMessage , boolean formating){
-        String errorFormated  = errorMessage;
+    public static void error(String errorMessage, boolean formating) {
+        String errorFormated = errorMessage;
         if (formating) {
             errorFormated = String.format("\n %S", errorMessage);
         }
@@ -103,23 +149,6 @@ public class Macropadmain {
         }
     }
 
-
-
-    //key = reihenfolge // String = die bezeichnung // boolean special (oder setPreset) // nummer der aktion
-    public static ArrayList<ArrayList<Object>> presets = new ArrayList<>(){{
-
-        add(new ArrayList<>(){{add("Function keys"); add(false);add(1);}} );
-        add(new ArrayList<>(){{add("Function keys but music"); add(false);add(6);}} );
-        add(new ArrayList<>(){{add("Wasd etc"); add(false);add(2);}} );
-        add(new ArrayList<>(){{add("numpad"); add(false);/*numpad kriegt 3,4*/add(3);}});
-        add(new ArrayList<>(){{add("music"); add(false);add(5);}} );
-
-        add(new ArrayList<>(){{add("exit");add(true);add(0);}} );
-        add(new ArrayList<>(){{add("PortSwitch"); add(true);add(1);}} );
-    }};
-
-
-
     //Dialoge
     public static void presetswichdialog() {
         ArrayList<String> possibilities = new ArrayList<>();
@@ -128,11 +157,11 @@ public class Macropadmain {
         }
 
         if (isPresetswitchdialog()) {
-            //Aktuelles preset suchen
-            int tmp = 0 ;
-            for (int i = 0; i < presets.size() - 1 ; i++) {
-                if ((int) presets.get(i).get(2) == getPreset()){
-                    tmp = i ;
+            //Aktuelles preset suchen bruh
+            int tmp = 0;
+            for (int i = 0; i < presets.size() - 1; i++) {
+                if ((int) presets.get(i).get(2) == getPreset()) {
+                    tmp = i;
                 }
             }
 
@@ -148,7 +177,8 @@ public class Macropadmain {
             else {
                 setPreset((int) presets.get(possibilities.indexOf(gewaehltesPreset)).get(2));
             }
-        }else {
+        }
+        else {
             if (getPreset() == Presets.getgesamtpresets()) {
                 setPreset(1);
             }
@@ -156,12 +186,6 @@ public class Macropadmain {
                 setPreset(getPreset() + 1);
             }
         }
-
-
-
-
-
-
 
 
 //old
@@ -255,7 +279,7 @@ public class Macropadmain {
         }
 
         if (Konsolenausgabe) {
-            error(String.format("\npreset=%d\n", getPreset()) ,false );
+            error(String.format("\npreset=%d\n", getPreset()), false);
         }
     }
 
@@ -276,45 +300,93 @@ public class Macropadmain {
         Macropadmain.presetSwitchDialog = presetswitchdialog;
     }
 
-    //zwei methoden zum speichern des presets in einer config
-    public static int initializePreset() {
-        var        trennzeichen = ":";
-        FileReader fr;
-        int        result       = 1;
-        try {
-            fr = new FileReader(config);
-            Scanner configScanner = new Scanner(fr);
-            var     tmp           = configScanner.nextLine();
-            fr.close();
-            configScanner.close();
-            result = Integer.parseInt(tmp.substring(tmp.indexOf(trennzeichen) + 1));
-        } catch (Exception ignored) {
+
+
+    //methoden zum speichern in einer config
+
+    public static int initializePort(){
+        Object[] tmp =  SerialPort.getCommPorts();
+        String[] ports = new String[ tmp.length];
+        for (int i = 0; i < ports.length; i++) {
+            ports[i] = tmp[i].toString();
         }
 
-        if (result == 0) {
-            result = 1;
+        for (int i = 0, portsLength = ports.length; i < portsLength; i++) {
+            String port = ports[ i ];
+            if (port.equals("USB2.0-Serial")) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static void writePort(int port){
+        write("portsAlt" , Arrays.toString(SerialPort.getCommPorts()));
+        write("port" , String.valueOf(port));
+    }
+
+
+    public static int initializePreset() {
+        int result = 1 ;
+        if (read("preset") != null){
+            result = Integer.parseInt(Objects.requireNonNull(read("preset")));
         }
         return result;
     }
 
     public static void writePreset(int preset) {
-        var        trennzeichen = ":";
+        write("preset" , String.valueOf(preset));
+    }
+
+    public static String read(String suchen){
+
+        //entweder lesen oder schreiben
+        FileReader fr;
+
+        try {
+            fr = new FileReader(config);
+            Scanner configScanner = new Scanner(fr);
+            var tmp        = configScanner.nextLine();
+            while (!tmp.substring(0 , tmp.indexOf(":")).equals(suchen)){
+                tmp = configScanner.nextLine();
+            }
+            fr.close();
+            configScanner.close();
+            return tmp.substring(tmp.indexOf(trennzeichen) + 1);
+        } catch (Exception ignored) {
+            return null ;
+        }
+    }
+
+    public static void write(String suchen , String schreiben ){
         FileReader fr;
         try {
             fr = new FileReader(config);
             Scanner configScanner = new Scanner(fr);
-            var     tmp           = configScanner.nextLine();
+            var           tmp  = configScanner.nextLine();
+            StringBuilder zuschreibendes = new StringBuilder();
+
+            while (!tmp.substring(0 , tmp.indexOf(":")).equals(suchen)){
+                zuschreibendes.append(tmp).append("\n");
+                tmp = configScanner.nextLine();
+            }
+            //einstellung überschreiben
+            zuschreibendes.append(tmp.substring(0, tmp.indexOf(trennzeichen) + 1)).append(schreiben).append("\n");
+
+            while (configScanner.hasNextLine()){
+                zuschreibendes.append(configScanner.nextLine()).append("\n");
+            }
 
             fr.close();
             configScanner.close();
-            tmp = tmp.substring(0, tmp.indexOf(trennzeichen) + 1) + preset;
 
             PrintWriter pw = new PrintWriter(new FileWriter(config));
-            pw.write(tmp);
+            pw.write(String.valueOf(zuschreibendes));
             pw.close();
 
         } catch (IOException ignored) {
         }
+
     }
 
     public static void setExit(boolean exit) {

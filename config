@@ -1,1 +1,3 @@
 preset:6
+portsAlt:[Serial0, USB2.0-Serial]
+port:1
