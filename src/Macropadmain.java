@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -65,6 +66,8 @@ public class Macropadmain {
                 error(String.format("Started with port %d and preset %d", port, preset) );
                 comPort.closePort();
             } catch (Exception ignored) {
+                port = 1 ;
+//                error = true ;
             }
         } while (!error);
     }
@@ -101,13 +104,74 @@ public class Macropadmain {
     }
 
 
-        //Dialoge
+
+    //key = reihenfolge // String = die bezeichnung // boolean special (oder setPreset) // nummer der aktion
+    public static ArrayList<ArrayList<Object>> presets = new ArrayList<>(){{
+
+        add(new ArrayList<>(){{add("Function keys"); add(false);add(1);}} );
+        add(new ArrayList<>(){{add("Function keys but music"); add(false);add(6);}} );
+        add(new ArrayList<>(){{add("Wasd etc"); add(false);add(2);}} );
+        add(new ArrayList<>(){{add("numpad"); add(false);/*numpad kriegt 3,4*/add(3);}});
+        add(new ArrayList<>(){{add("music"); add(false);add(5);}} );
+
+        add(new ArrayList<>(){{add("exit");add(true);add(0);}} );
+        add(new ArrayList<>(){{add("PortSwitch"); add(true);add(1);}} );
+    }};
+
+
+
+    //Dialoge
     public static void presetswichdialog() {
+        ArrayList<String> possibilities = new ArrayList<>();
+        for (ArrayList<Object> objects : presets) {
+            possibilities.add((String) objects.get(0));
+        }
+
+        if (isPresetswitchdialog()) {
+            //Aktuelles preset suchen
+            int tmp = 0 ;
+            for (int i = 0; i < presets.size() - 1 ; i++) {
+                if ((int) presets.get(i).get(2) == getPreset()){
+                    tmp = i ;
+                }
+            }
+
+            String gewaehltesPreset = (String) JOptionPane.showInputDialog(null, String.format("Preset wählen (aktuell = %s )", presets.get(tmp).get(0)), "Preset", JOptionPane.QUESTION_MESSAGE, null, possibilities.toArray(), "1");
+
+
+            error(gewaehltesPreset);
+
+            System.out.println(possibilities.indexOf(gewaehltesPreset));
+            if ((boolean) presets.get(possibilities.indexOf(gewaehltesPreset)).get(1)) {
+                special((int) presets.get(possibilities.indexOf(gewaehltesPreset)).get(2));
+            }
+            else {
+                setPreset((int) presets.get(possibilities.indexOf(gewaehltesPreset)).get(2));
+            }
+        }else {
+            if (getPreset() == Presets.getgesamtpresets()) {
+                setPreset(1);
+            }
+            else {
+                setPreset(getPreset() + 1);
+            }
+        }
+
+
+
+
+
+
+
+
+//old
+/*
         if (isPresetswitchdialog()) {
             String   fk            = "Function keys", wasd = "Wasd etc", numpad = "numpad", exit = "exit", music = "music", fkm = "Function keys but music", portSwitch = "PortSwitch";
-            Object[] possibilities = {fk, fkm, wasd, numpad, music, portSwitch, exit};
+            String[] possibilities = {fk, fkm, wasd, numpad, music, portSwitch, exit};
+
             try {
-                String presetInString = (String) JOptionPane.showInputDialog(null, "choose preset", "Preset", JOptionPane.QUESTION_MESSAGE, null, possibilities, "1");
+                String presetInString = (String) JOptionPane.showInputDialog(null, String.format("Preset wählen (aktuell = %d )" , getPreset()), "Preset", JOptionPane.QUESTION_MESSAGE, null, possibilities, "1");
 
                 error(presetInString);
 
@@ -141,6 +205,7 @@ public class Macropadmain {
                 setPreset(getPreset() + 1);
             }
         }
+*/
     }
 
     public static void showerrordialog(String message) {
@@ -206,6 +271,7 @@ public class Macropadmain {
         return presetSwitchDialog;
     }
 
+    //TODO
     public static void setPresetwitchdialog(boolean presetswitchdialog) {
         Macropadmain.presetSwitchDialog = presetswitchdialog;
     }

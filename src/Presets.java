@@ -31,7 +31,8 @@ public class Presets {
             put(10 , new ArrayList<>(){{add(0);}});
             put(11 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_WINDOWS);add(KeyEvent.VK_LEFT);}});
             put(12 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_WINDOWS);add(KeyEvent.VK_RIGHT);}});
-            put(13 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_PAGE_UP);}});}});
+            put(13 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_PAGE_UP);}});
+        }});
         //preset 2 wasd
         presets.add(new HashMap<>() {{
             //reihe 1
@@ -103,8 +104,12 @@ public class Presets {
         //preset 6 funktion keys with music
         presets.add(new HashMap<>() {{
             putAll(presets.get(0));
+            replace(7 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_NUMPAD2);}});
+
+
             replace(11 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_NUMPAD4);}});
             replace(12 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_NUMPAD6);}});
+
         }});
     }
 
