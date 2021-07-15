@@ -1,3 +1,5 @@
+package Macropad;
+
 import com.fazecast.jSerialComm.SerialPort;
 
 import java.awt.*;

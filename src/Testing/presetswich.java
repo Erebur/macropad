@@ -1,3 +1,7 @@
+package Testing;
+
+import Macropad.Presets;
+
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashMap;
