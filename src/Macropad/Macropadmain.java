@@ -18,7 +18,8 @@ public class Macropadmain {
 
     //0 aus // 1 console // 2 pop up // 3 (1 + 2)
     private static final int debugLevel = 1;
-    public static Preset preset = new Preset("unix");
+    private static String os = "unix";
+    public static Preset preset = new Preset(os);
     //der Pfad der config datei die zum speichern des presets genutzt wird
     private static final File config = new File("C:\\Users\\simon\\OneDrive\\Dokumente\\Programmieren\\eigengebrauch\\macropad\\config");
     private static final char trennzeichen = ':';
@@ -63,7 +64,8 @@ public class Macropadmain {
     }};
     //das preset wird aus dieser datei gesucht
     private static int presetNr = initializePreset();
-    private static int port = initializePort();
+    //wird versucht automatisch dem Port zu suchen (error = -1 )
+    private static int port = autoPortSuchen();
     private static boolean presetSwitchDialog = true;
     //speichert den status des numlocks --> nur am anfang des Programms aktuell --> fängt keine änderungen ab
     private static boolean numLock = Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_NUM_LOCK);
@@ -72,9 +74,9 @@ public class Macropadmain {
     public static void main(String[] args) throws InterruptedException {
         //usereingabe des Ports
         // bei falscher eingabe wartet das programm ewig auf eingabe durch serial Port bekommt aber nie etwas -> das programm macht nicht und man kann nicht beenden (was ungünstig ist lol)
-        //TODO mit arduino den Port übergeben und automatisch richtig wählen
+        //TODO mit arduino den Port übergeben und automatisch richtig wählen lol 
         if (port == -1){
-            portsuchen();
+            portSuchenDialog();
         }
 
 
@@ -102,7 +104,7 @@ public class Macropadmain {
         JOptionPane.showMessageDialog(null, "exited");
     }
 
-    public static void portsuchen() {
+    public static void portSuchenDialog() {
         boolean error = false;
         do {
             try {
@@ -225,7 +227,7 @@ public class Macropadmain {
     public static void special(int type) {
         switch (type){
             case 0 -> setExit(true);
-            case 1 -> portsuchen();
+            case 1 -> portSuchenDialog();
         }
     }
 
@@ -264,7 +266,7 @@ public class Macropadmain {
 
     //methoden zum speichern in einer config
 
-    public static int initializePort(){
+    public static int autoPortSuchen(){
         Object[] tmp =  SerialPort.getCommPorts();
         String[] ports = new String[ tmp.length];
         for (int i = 0; i < ports.length; i++) {

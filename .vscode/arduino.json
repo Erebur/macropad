@@ -1,5 +1,4 @@
 {
     "port": "/dev/ttyUSB0",
-    "board": "arduino:avr:micro",
-    "programmer": "arduino:avrisp"
+    "board": "arduino:avr:micro"
 }
