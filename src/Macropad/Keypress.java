@@ -9,6 +9,9 @@ import java.util.Scanner;
 
 
 public class Keypress {
+
+    private static Preset preset = Macropadmain.preset;
+
     //im prinzip main
     public static void keypress(SerialPort comPort) throws AWTException, InterruptedException {
         ArrayList<Integer> oldInput        = new ArrayList<>();
@@ -49,7 +52,7 @@ public class Keypress {
 
             if (!matched){
                 oldInput.add(input);
-                int[] key = Presets.getKey(input);
+                int[] key = preset.getKey(input);
                 //sucht sich den Hexcode aus den presets
 
                 switch (key[ 0 ]) {

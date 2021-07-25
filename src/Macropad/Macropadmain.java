@@ -18,6 +18,7 @@ public class Macropadmain {
 
     //0 aus // 1 console // 2 pop up // 3 (1 + 2)
     private static final int debugLevel = 1;
+    public static Preset preset = new Preset("unix");
     //der Pfad der config datei die zum speichern des presets genutzt wird
     private static final File config = new File("C:\\Users\\simon\\OneDrive\\Dokumente\\Programmieren\\eigengebrauch\\macropad\\config");
     private static final char trennzeichen = ':';
@@ -61,7 +62,7 @@ public class Macropadmain {
         }});
     }};
     //das preset wird aus dieser datei gesucht
-    private static int preset = initializePreset();
+    private static int presetNr = initializePreset();
     private static int port = initializePort();
     private static boolean presetSwitchDialog = true;
     //speichert den status des numlocks --> nur am anfang des Programms aktuell --> fängt keine änderungen ab
@@ -109,7 +110,7 @@ public class Macropadmain {
                 SerialPort comPort = SerialPort.getCommPorts()[ port ];
                 comPort.openPort();
                 error = true;
-                error(String.format("Started with port %d and preset %d", port, preset));
+                error(String.format("Started with port %d and preset %d", port, presetNr));
                 comPort.closePort();
             } catch (Exception ignored) {
                 port = 1;
@@ -181,7 +182,7 @@ public class Macropadmain {
             }
         }
         else {
-            if (getPreset() == Presets.getgesamtpresets()) {
+            if (getPreset() == preset.getgesamtpresets()) {
                 setPreset(1);
             }
             else {
@@ -189,49 +190,6 @@ public class Macropadmain {
             }
         }
 
-
-//old
-/*
-        if (isPresetswitchdialog()) {
-            String   fk            = "Function keys", wasd = "Wasd etc", numpad = "numpad", exit = "exit", music = "music", fkm = "Function keys but music", portSwitch = "PortSwitch";
-            String[] possibilities = {fk, fkm, wasd, numpad, music, portSwitch, exit};
-
-            try {
-                String presetInString = (String) JOptionPane.showInputDialog(null, String.format("Preset wählen (aktuell = %d )" , getPreset()), "Preset", JOptionPane.QUESTION_MESSAGE, null, possibilities, "1");
-
-                error(presetInString);
-
-                if (presetInString.equals(exit)){
-                    special(0);
-                }else if (presetInString.equals(portSwitch)){
-                    special(1);
-                }else if (presetInString.equals(fk)){
-                    setPreset(1);
-                }else if (presetInString.equals(fkm)){
-                    setPreset(6);
-                }else if (presetInString.equals(wasd)){
-                    setPreset(2);
-                }else if (presetInString.equals(numpad)){
-                    setPreset(3);
-                    //numpad kriegt 3,4
-                }else if (presetInString.equals(music)){
-                    setPreset(5);
-                }
-
-
-            } catch (NullPointerException ignored) {
-                //Falls der dialog abgebrochen wird einfach ignorieren
-            }
-        }
-        else {
-            if (getPreset() == Presets.getgesamtpresets()) {
-                setPreset(1);
-            }
-            else {
-                setPreset(getPreset() + 1);
-            }
-        }
-*/
     }
 
     public static void showerrordialog(String message) {
@@ -273,10 +231,10 @@ public class Macropadmain {
 
     public static void setPreset(int preset, boolean Konsolenausgabe) {
         if (preset == 0) {
-            Macropadmain.preset = preset;
+            Macropadmain.presetNr = preset;
         }
         else {
-            Macropadmain.preset = preset;
+            Macropadmain.presetNr = preset;
             writePreset(preset);
         }
 
@@ -286,7 +244,7 @@ public class Macropadmain {
     }
 
     public static int getPreset() {
-        return preset;
+        return presetNr;
     }
 
     public static void setPreset(int preset) {
