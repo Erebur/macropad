@@ -4,10 +4,9 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Presets {
+public class PresetsWin {
 
     //https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
-    //https://docs.oracle.com/javase/7/docs/api/java/awt/event/KeyEvent.html
     private static final ArrayList<HashMap<Integer, ArrayList<Integer>>> presets = new ArrayList<>();
 
     static {

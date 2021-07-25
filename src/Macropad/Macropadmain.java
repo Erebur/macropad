@@ -67,7 +67,7 @@ public class Macropadmain {
     //speichert den status des numlocks --> nur am anfang des Programms aktuell --> fängt keine änderungen ab
     private static boolean numLock = Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_NUM_LOCK);
     private static boolean exit = false;
-
+    
     public static void main(String[] args) throws InterruptedException {
         //usereingabe des Ports
         // bei falscher eingabe wartet das programm ewig auf eingabe durch serial Port bekommt aber nie etwas -> das programm macht nicht und man kann nicht beenden (was ungünstig ist lol)
@@ -138,7 +138,7 @@ public class Macropadmain {
     public static void error(String errorMessage, boolean formating) {
         String errorFormated = errorMessage;
         if (formating) {
-            errorFormated = String.format("\n %S", errorMessage);
+            errorFormated = String.format("\n %s", errorMessage);
         }
         //0 aus // 1 console // 2 pop up // 3 (1 + 2)
         switch (debugLevel){
