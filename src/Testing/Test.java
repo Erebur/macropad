@@ -2,20 +2,15 @@ package Testing;
 
 import com.fazecast.jSerialComm.SerialPort;
 
+import javax.swing.*;
 import java.awt.*;
- 
+import java.util.Arrays;
+
 public class Test{
     public static void main(String[] args) throws AWTException {
-        Object[] tmp =  SerialPort.getCommPorts();
-        String[] ports = new String[ tmp.length];
-        for (int i = 0; i < ports.length; i++) {
-            ports[i] = tmp[i].toString();
-        }
+        Integer  p = null;
+        p = Integer.parseInt(JOptionPane.showInputDialog(null, Arrays.toString(SerialPort.getCommPorts())));
 
-        for (int i = 0, portsLength = ports.length; i < portsLength; i++) {
-            String port = ports[ i ];
-            System.out.println(port);
-        }
     }
 
 
