@@ -75,21 +75,29 @@ public class Macropadmain {
     }
 
     public static void portSuchenDialog() {
-        boolean error = false;
+        SerialPort comPort = null ;
+        String input = null;
+
         do {
+            input = JOptionPane.showInputDialog(null, Arrays.toString(SerialPort.getCommPorts()));
+
+
             try {
-                port = Integer.parseInt(JOptionPane.showInputDialog(null, Arrays.toString(SerialPort.getCommPorts())));
-                SerialPort comPort = SerialPort.getCommPorts()[ port ];
+                port = Integer.parseInt(input);
+                comPort = SerialPort.getCommPorts()[port];
                 comPort.openPort();
-                error = true;
+                writePort(port);
                 error(String.format("Started with port %d and preset %d", port, presetNr));
                 comPort.closePort();
-            } catch (Exception ignored) {
-                port = 1;
-//                error = true ;
+                return;
+            }catch (NumberFormatException e){
+                error("Bitte Nummer eingeben");
+            }catch (Exception e) {
+                error("Fehler" + e.getMessage());
             }
-        } while (!error);
-        writePort(port);
+        //solte tmp null sein wurde warscheinlich abgebrochen
+        }while (input != null);
+        setExit(true);
     }
 
 
@@ -178,6 +186,10 @@ public class Macropadmain {
             //noinspection BusyWait
             sleep(20);
         }
+    }
+
+    public static boolean isExit() {
+        return exit;
     }
 
     public static void testnumlock(boolean Konsolenausgabe) {

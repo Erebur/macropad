@@ -17,7 +17,7 @@ public class Keypress {
         ArrayList<Integer> oldInput        = new ArrayList<>();
         int                oldInputAusgabe = 0;
 
-        while (Macropadmain.getPreset() != 0) {
+        while (Macropadmain.getPreset() != 0 & !Macropadmain.isExit()) {
             Scanner s     = new Scanner(comPort.getInputStream());
 
             //waits for input
