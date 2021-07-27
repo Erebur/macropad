@@ -18,50 +18,10 @@ public class Macropadmain {
 
     //0 aus // 1 console // 2 pop up // 3 (1 + 2)
     private static final int debugLevel = 1;
-    private static String os = "unix";
-    public static Preset preset = new Preset(os);
+    public static Preset preset = new Preset(System.getProperty("os.name").toLowerCase());
     //der Pfad der config datei die zum speichern des presets genutzt wird
-    private static final File config = new File("C:\\Users\\simon\\OneDrive\\Dokumente\\Programmieren\\eigengebrauch\\macropad\\config");
+    private static File config = null;
     private static final char trennzeichen = ':';
-    //key = reihenfolge // String = die bezeichnung // boolean special (oder setPreset) // nummer der aktion
-    public static ArrayList<ArrayList<Object>> presets = new ArrayList<>() {{
-        add(new ArrayList<>() {{
-            add("Function keys");
-            add(false);
-            add(1);
-        }});
-        add(new ArrayList<>() {{
-            add("Function keys but music");
-            add(false);
-            add(6);
-        }});
-        add(new ArrayList<>() {{
-            add("Wasd etc");
-            add(false);
-            add(2);
-        }});
-        add(new ArrayList<>() {{
-            add("numpad");
-            add(false);/*numpad kriegt 3,4*/
-            add(3);
-        }});
-        add(new ArrayList<>() {{
-            add("music");
-            add(false);
-            add(5);
-        }});
-
-        add(new ArrayList<>() {{
-            add("exit");
-            add(true);
-            add(0);
-        }});
-        add(new ArrayList<>() {{
-            add("PortSwitch");
-            add(true);
-            add(1);
-        }});
-    }};
     //das preset wird aus dieser datei gesucht
     private static int presetNr = initializePreset();
     //wird versucht automatisch dem Port zu suchen (error = -1 )
@@ -70,6 +30,16 @@ public class Macropadmain {
     //speichert den status des numlocks --> nur am anfang des Programms aktuell --> fängt keine änderungen ab
     private static boolean numLock = Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_NUM_LOCK);
     private static boolean exit = false;
+
+    static {
+        String os = System.getProperty("os.name").toLowerCase();
+
+        if (os.contains("linux")){
+            config = new File("/home/erebur/Documents/Programmieren/eigengebrauch/macropad/config");
+        }else if(os.contains("win")){
+            config = new File("C:\\Users\\simon\\OneDrive\\Dokumente\\Programmieren\\eigengebrauch\\macropad\\config");
+        }
+    }
     
     public static void main(String[] args) throws InterruptedException {
         //usereingabe des Ports
@@ -175,16 +145,21 @@ public class Macropadmain {
 
             error(gewaehltesPreset);
 
-            System.out.println(possibilities.indexOf(gewaehltesPreset));
-            if ((boolean) presets.get(possibilities.indexOf(gewaehltesPreset)).get(1)) {
-                special((int) presets.get(possibilities.indexOf(gewaehltesPreset)).get(2));
+            if (gewaehltesPreset != null){
+                System.out.println(possibilities.indexOf(gewaehltesPreset));
+                if ((boolean) presets.get(possibilities.indexOf(gewaehltesPreset)).get(1)) {
+                    special((int) presets.get(possibilities.indexOf(gewaehltesPreset)).get(2));
+                }
+                else {
+                    setPreset((int) presets.get(possibilities.indexOf(gewaehltesPreset)).get(2));
+                }
+            }else{
+                error("presetswichdialog abgebrochen, " + getPreset());
             }
-            else {
-                setPreset((int) presets.get(possibilities.indexOf(gewaehltesPreset)).get(2));
-            }
+
         }
         else {
-            if (getPreset() == preset.getgesamtpresets()) {
+            if (getPreset() >= preset.getgesamtpresets()) {
                 setPreset(1);
             }
             else {
@@ -241,7 +216,7 @@ public class Macropadmain {
         }
 
         if (Konsolenausgabe) {
-            error(String.format("\npreset=%d\n", getPreset()), false);
+            error(String.format("\npreset=%d", getPreset()), false);
         }
     }
 
@@ -275,7 +250,7 @@ public class Macropadmain {
 
         for (int i = 0, portsLength = ports.length; i < portsLength; i++) {
             String port = ports[ i ];
-            if (port.equals("USB2.0-Serial")) {
+            if (port.equals("USB2.0-Serial") | port.contains("ch341")) {
                 return i;
             }
         }
@@ -297,7 +272,7 @@ public class Macropadmain {
     }
 
     public static void writePreset(int preset) {
-        write("preset" , String.valueOf(preset));
+        write(" preset" , String.valueOf(preset));
     }
 
     public static String read(String suchen){
@@ -354,4 +329,45 @@ public class Macropadmain {
     public static void setExit(boolean exit) {
         Macropadmain.exit = exit;
     }
+
+     //key = reihenfolge // String = die bezeichnung // boolean special (oder setPreset) // nummer der aktion
+     public static ArrayList<ArrayList<Object>> presets = new ArrayList<>() {{
+        add(new ArrayList<>() {{
+            add("Function keys");
+            add(false);
+            add(1);
+        }});
+        add(new ArrayList<>() {{
+            add("Function keys but music");
+            add(false);
+            add(6);
+        }});
+        add(new ArrayList<>() {{
+            add("Wasd etc");
+            add(false);
+            add(2);
+        }});
+        add(new ArrayList<>() {{
+            add("numpad");
+            add(false);/*numpad kriegt 3,4*/
+            add(3);
+        }});
+        add(new ArrayList<>() {{
+            add("music");
+            add(false);
+            add(5);
+        }});
+
+        add(new ArrayList<>() {{
+            add("exit");
+            add(true);
+            add(0);
+        }});
+        add(new ArrayList<>() {{
+            add("PortSwitch");
+            add(true);
+            add(1);
+        }});
+    }};
+
 }

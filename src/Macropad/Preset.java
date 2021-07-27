@@ -22,24 +22,21 @@ public class Preset {
             //preset 1 functions
             presets.add(new HashMap<>() {{
                 //reihe 1
-                    //win keys
-                put(2 , new ArrayList<>(){{add(KeyEvent.VK_WINDOWS);add(KeyEvent.VK_G);}});
-                put(3 , new ArrayList<>(){{add(KeyEvent.VK_WINDOWS);add(KeyEvent.VK_TAB);}});
-                    //discord
+                put(2 , new ArrayList<>(){{add(KeyEvent.VK_WINDOWS);}});
+                put(3 , new ArrayList<>(){{add(KeyEvent.VK_WINDOWS);}});
                 put(4 , new ArrayList<>(){{add(KeyEvent.VK_F14);}});
                 put(5 , new ArrayList<>(){{add(KeyEvent.VK_F15);}});
                 //reihe 2
-                    //geforce Overlay
-                put(6 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_R);}});
-                put(7 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_T);}});
+                put(6 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);}});
+                put(7 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);}});
                 //music
-                put(8 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_NUMPAD5);}});
-                put(9 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_PAGE_DOWN);}});
+                put(8 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);}});
+                put(9 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);}});
                 //reihe 4
                 put(10 , new ArrayList<>(){{add(0);}});
-                put(11 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_WINDOWS);add(KeyEvent.VK_LEFT);}});
-                put(12 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_WINDOWS);add(KeyEvent.VK_RIGHT);}});
-                put(13 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_PAGE_UP);}});
+                put(11 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);}});
+                put(12 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);}});
+                put(13 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);}});
             }});
             //preset 2 wasd
             presets.add(new HashMap<>() {{
@@ -119,29 +116,30 @@ public class Preset {
                 replace(12 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_NUMPAD6);}});
 
             }});
-        }else if (os.equals("unix")){
+
+
+        }else if (os.equals("linux")){
+                //KeyEvent.VK_WINDOWS macht nichts
 
             //preset 1 functions
             presets.add(new HashMap<>() {{
                 //reihe 1
                     //win keys
-                put(2 , new ArrayList<>(){{add(KeyEvent.VK_WINDOWS);add(KeyEvent.VK_G);}});
-                put(3 , new ArrayList<>(){{add(KeyEvent.VK_WINDOWS);add(KeyEvent.VK_TAB);}});
-                    //discord
-                put(4 , new ArrayList<>(){{add(KeyEvent.VK_F14);}});
-                put(5 , new ArrayList<>(){{add(KeyEvent.VK_F15);}});
+                put(2 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_SHIFT);add(KeyEvent.VK_F1);}});
+                put(3 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_SHIFT);add(KeyEvent.VK_F2);}});
+                put(4 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_SHIFT);add(KeyEvent.VK_F3);}});
+                put(5 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_SHIFT);add(KeyEvent.VK_0);}});
                 //reihe 2
-                    //geforce Overlay
-                put(6 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_R);}});
-                put(7 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_T);}});
-                //music
-                put(8 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_NUMPAD5);}});
-                put(9 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_PAGE_DOWN);}});
+
+                put(6 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_SHIFT);add(KeyEvent.VK_F4);}});
+                put(7 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_SHIFT);add(KeyEvent.VK_F5);}});
+                put(8 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_SHIFT);add(KeyEvent.VK_F6);}});
+                put(9 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_SHIFT);add(KeyEvent.VK_MINUS);}});
                 //reihe 4
                 put(10 , new ArrayList<>(){{add(0);}});
-                put(11 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_WINDOWS);add(KeyEvent.VK_LEFT);}});
-                put(12 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_WINDOWS);add(KeyEvent.VK_RIGHT);}});
-                put(13 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_PAGE_UP);}});
+                put(11 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_LEFT);}});
+                put(12 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_RIGHT);}});
+                put(13 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_SHIFT);add(KeyEvent.VK_PLUS);}});
             }});
             //preset 2 wasd
             presets.add(new HashMap<>() {{
@@ -214,11 +212,11 @@ public class Preset {
             //preset 6 funktion keys with music
             presets.add(new HashMap<>() {{
                 putAll(presets.get(0));
-                replace(7 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_NUMPAD2);}});
+                //replace(7 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_NUMPAD2);}});
 
 
-                replace(11 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_NUMPAD4);}});
-                replace(12 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_NUMPAD6);}});
+                replace(11 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_SHIFT);add(KeyEvent.VK_F11);}});
+                replace(12 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_SHIFT);add(KeyEvent.VK_F12);}});
 
             }});
         }
