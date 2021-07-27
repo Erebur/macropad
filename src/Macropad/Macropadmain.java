@@ -20,7 +20,7 @@ public class Macropadmain {
     private static final int debugLevel = 1;
     public static Preset preset = new Preset(System.getProperty("os.name").toLowerCase());
     //der Pfad der config datei die zum speichern des presets genutzt wird
-    private static File config = null;
+    private static final File config = Macropadmain.getConfig();
     private static final char trennzeichen = ':';
     //das preset wird aus dieser datei gesucht
     private static int presetNr = initializePreset();
@@ -31,15 +31,6 @@ public class Macropadmain {
     private static boolean numLock = Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_NUM_LOCK);
     private static boolean exit = false;
 
-    static {
-        String os = System.getProperty("os.name").toLowerCase();
-
-        if (os.contains("linux")){
-            config = new File("/home/erebur/Documents/Programmieren/eigengebrauch/macropad/config");
-        }else if(os.contains("win")){
-            config = new File("C:\\Users\\simon\\OneDrive\\Dokumente\\Programmieren\\eigengebrauch\\macropad\\config");
-        }
-    }
     
     public static void main(String[] args) throws InterruptedException {
         //usereingabe des Ports
@@ -287,13 +278,25 @@ public class Macropadmain {
         write(" preset" , String.valueOf(preset));
     }
 
+    public static File getConfig() {
+        String os = System.getProperty("os.name").toLowerCase();
+        //TODO relative Pfade
+
+        if (os.contains("linux")){
+            return  new File("/home/erebur/Documents/Programmieren/eigengebrauch/macropad/config");
+        }else if(os.contains("win")){
+            return  new File("C:\\Users\\simon\\OneDrive\\Dokumente\\Programmieren\\eigengebrauch\\macropad\\config");
+        }
+        return null;
+    }
+
     public static String read(String suchen){
 
         //entweder lesen oder schreiben
         FileReader fr;
 
         try {
-            fr = new FileReader(config);
+            fr = new FileReader(Objects.requireNonNull(Macropadmain.getConfig()));
             Scanner configScanner = new Scanner(fr);
             var tmp        = configScanner.nextLine();
             while (!tmp.substring(0 , tmp.indexOf(":")).equals(suchen)){
