@@ -15,7 +15,7 @@ public class Macropad {
 
     //0 aus // 1 console // 2 pop up // 3 (1 + 2)
     private static final int DEBUG_LEVEL = 1;
-    //der Pfad der config datei die zum speichern des presets genutzt wird
+    //der Pfad der config datei die zum Speichern des presets genutzt wird
     private static final File CONFIG = Macropad.getConfig();
     private static final char TRENNZEICHEN = ':';
 
@@ -25,7 +25,7 @@ public class Macropad {
     //wird versucht automatisch dem Port zu suchen (error = -1 )
     private int port;
     private boolean presetSwitchDialog ;
-    //speichert den status des numlocks --> nur am anfang des Programms aktuell --> fängt keine änderungen ab
+    //speichert den status des numlocks → nur am anfang des Programms aktuell → fängt keine änderungen ab
     private boolean numLock ;
     private boolean exit;
 
@@ -42,7 +42,7 @@ public class Macropad {
         this(new Preset());
     }
 
-    public void start() throws InterruptedException {
+    public void start() {
 
         //usereingabe des Ports
         // bei falscher eingabe wartet das programm ewig auf eingabe durch serial Port bekommt aber nie etwas -> das programm macht nicht und man kann nicht beenden (was ungünstig ist lol)
@@ -69,7 +69,7 @@ public class Macropad {
             } catch (Exception e) {
                 e.printStackTrace();
                 error(comPort, e);
-                //wär doch ungünstig wenn man errors(mit pop ups) ohne ende bekommen würde und man nicht abbrechen kann lol
+                //wär doch ungünstig, wenn man errors(mit Pop-ups) ohne Ende bekommen würde und man nicht abbrechen kann lol
                 presetswichdialog();
             }
         }
@@ -105,14 +105,18 @@ public class Macropad {
     }
 
 
-    private void error(SerialPort comPort, Throwable e) throws InterruptedException {
-        debug(String.format("%S \n%S", "a error occurred restarting with 10sec delay", e.toString()));
+    private void error(SerialPort comPort, Throwable e) {
+        debug(String.format("\t%s \n%s", "a error occurred restarting with 10sec delay", e.toString()));
 
         if (comPort != null && comPort.isOpen()) {
             comPort.closePort();
         }
         //10 sec
-        sleep(10000);
+        try {
+            sleep(10000);
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+        }
     }
 
     private static void debug(String errorMessage) {
@@ -227,11 +231,15 @@ public class Macropad {
             this.presetNr = preset;
         } else {
             this.presetNr = preset;
-            writePreset(preset);
+            try {
+                writePreset(preset);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         if (Konsolenausgabe) {
-            debug(String.format("\npreset=%d", getPreset()), false);
+            debug(String.format("preset=%d\n", getPreset()), false);
         }
     }
 
@@ -260,7 +268,7 @@ public class Macropad {
 
 
 
-    //methoden zum speichern in einer config
+    //methoden zum Speichern in einer config
     public static int autoPortSuchen(){
         Object[] tmp =  SerialPort.getCommPorts();
         String[] ports = new String[ tmp.length];
@@ -277,23 +285,29 @@ public class Macropad {
         return -1;
     }
 
-    protected static void writePort(int port){
-        write("portsAlt" , Arrays.toString(SerialPort.getCommPorts()));
-        write("port" , String.valueOf(port));
+
+    //really useless
+    protected static void writePort(int port) throws IOException {
+//        write("portsAlt" , Integer.valueOf(Arrays.toString(SerialPort.getCommPorts())));
+        write("port" , port);
     }
 
+    private static void writePreset(int preset) throws IOException {
+        write("preset" , preset);
+    }
 
     private static int initializePreset() {
-        int result = 1 ;
-        if (read("preset") != null){
-            result = Integer.parseInt(Objects.requireNonNull(read("preset")));
+        int port = 1 ;
+
+        try {
+            port = Objects.requireNonNull(read("preset"));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return result;
+        return port;
     }
 
-    private static void writePreset(int preset) {
-        write("preset" , String.valueOf(preset));
-    }
+
 
     private static File getConfig() {
         String os = System.getProperty("os.name").toLowerCase();
@@ -304,77 +318,70 @@ public class Macropad {
         }else if(os.contains("win")){
             return  new File("C:\\Users\\simon\\OneDrive\\Dokumente\\Programmieren\\eigengebrauch\\macropad\\config");
         }
-        return null;
+        return new File("./config");
     }
 
-    private static String read(String suchen){
+    private static Integer read(String suchen) throws IOException {
 
         //entweder lesen oder schreiben
-        FileReader fr;
-
-        try {
-            fr = new FileReader(Objects.requireNonNull(Macropad.getConfig()));
-            Scanner configScanner = new Scanner(fr);
-            var tmp        = configScanner.nextLine();
-            while (!tmp.substring(0 , tmp.indexOf(":")).equals(suchen)){
-                tmp = configScanner.nextLine();
-            }
-            fr.close();
-            configScanner.close();
-            return tmp.substring(tmp.indexOf(TRENNZEICHEN) + 1);
-        } catch (Exception ignored) {
-            return null ;
+        if (read().containsKey(suchen)){
+            return read().get(suchen);
+        }else {
+            throw new RuntimeException("not Found" + suchen);
         }
     }
-/*    private static  LinkedHashMap<String , Integer> read(){
 
+    private static LinkedHashMap<String, Integer> read() throws IOException {
 
-
-
-    }*/
-
-
-    private static void write(String suchen , String schreiben ){
         FileReader fr;
-        try {
-            fr = new FileReader(CONFIG);
-            Scanner configScanner = new Scanner(fr);
-            LinkedHashMap<String , Integer> daten = new LinkedHashMap<>();
+        fr = new FileReader(CONFIG);
+        Scanner configScanner = new Scanner(fr);
+        LinkedHashMap<String , Integer> daten = new LinkedHashMap<>();
 
-            while (configScanner.hasNextLine()){
-                var tmp = configScanner.nextLine();
-                if(!tmp.isEmpty()) {
-                    daten.put(tmp.substring(0 , tmp.indexOf(TRENNZEICHEN)), Integer.parseInt(String.valueOf(tmp.charAt(tmp.length() - 1 ))));
-                }
+        while (configScanner.hasNextLine()){
+            var tmp = configScanner.nextLine();
+            if(!tmp.isEmpty()) {
+                daten.put(tmp.substring(0 , tmp.indexOf(TRENNZEICHEN)), Integer.parseInt(String.valueOf(tmp.charAt(tmp.length() - 1 ))));
             }
-
-           if (daten.containsKey(suchen)){
-               daten.replace(suchen , Integer.valueOf(schreiben));
-           }else{
-               daten.put(suchen , Integer.valueOf(schreiben));
-           }
-
-           StringBuilder neu = new StringBuilder();
-           String[] list = daten.keySet().toArray(new String[0]);
-
-           for (String s : list) {
-                neu.append(String.format("%s:%s\n", s, daten.get(s)));
-            }
-
-            fr.close();
-            configScanner.close();
-
-            PrintWriter pw = new PrintWriter(new FileWriter(CONFIG));
-            pw.write(String.valueOf(neu));
-            pw.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+
+        fr.close();
+        configScanner.close();
+
+        return daten;
+    }
+
+
+    private static void write(String suchen , Integer schreiben ) throws IOException {
+
+        LinkedHashMap<String, Integer> daten = read();
+
+
+        if (daten.containsKey(suchen)){
+            daten.replace(suchen , schreiben);
+        }else{
+            daten.put(suchen , schreiben);
+        }
+
+        StringBuilder neu = new StringBuilder();
+        String[] list = daten.keySet().toArray(new String[0]);
+
+        for (String s : list) {
+            neu.append(String.format("%s:%s\n", s, daten.get(s)));
+        }
+
+
+        PrintWriter pw = new PrintWriter(new FileWriter(CONFIG));
+        pw.write(String.valueOf(neu));
+        pw.close();
+
+
 
     }
 
-     //key = reihenfolge // String = die bezeichnung // boolean special (oder setPreset) // nummer der aktion
+
+
+    //key = reihenfolge // String = die bezeichnung // boolean special (oder setPreset) // nummer der aktion
      public static ArrayList<ArrayList<Object>> presets = new ArrayList<>() {{
         add(new ArrayList<>() {{
             add("Function keys");

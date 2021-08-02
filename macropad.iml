@@ -9,5 +9,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Python 3.9 interpreter library" level="application" />
     <orderEntry type="library" name="jSerialComm-2.6.2" level="project" />
+    <orderEntry type="library" name="MigLayout" level="project" />
   </component>
 </module>
