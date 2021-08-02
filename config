@@ -1,3 +1,2 @@
-preset:6
-portsAlt:[Serial0, USB2.0-Serial]
+preset:1
 port:1

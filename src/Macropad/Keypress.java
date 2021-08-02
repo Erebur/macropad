@@ -10,18 +10,27 @@ import java.util.Scanner;
 
 public class Keypress {
 
-    private static Preset preset = Macropadmain.preset;
+    private Preset preset;
+    private final SerialPort comPort;
+    private final Macropad macropad ;
+
+
+    public Keypress(SerialPort comPort,Macropad macropad) {
+        this.comPort = comPort;
+        this.macropad = macropad;
+        this.preset = macropad.preset;
+    }
 
     //im prinzip main
-    public static void keypress(SerialPort comPort) throws AWTException, InterruptedException {
+    public void start() throws AWTException, InterruptedException {
         ArrayList<Integer> oldInput        = new ArrayList<>();
         int                oldInputAusgabe = 0;
 
-        while (Macropadmain.getPreset() != 0 & !Macropadmain.isExit()) {
+        while (macropad.getPreset() != 0 & !macropad.isExit()) {
             Scanner s     = new Scanner(comPort.getInputStream());
 
             //waits for input
-            Macropadmain.waiting(comPort);
+            Macropad.waiting(comPort);
 
             //saves input in var
             var input = aufzahltesten(s);
@@ -32,7 +41,7 @@ public class Keypress {
             if (true) {
                 if (oldInputAusgabe != input) System.out.println();
                 oldInputAusgabe = input;
-                Macropadmain.error(String.valueOf(input) , false);
+                Macropad.debug(String.valueOf(input) , false);
             }
 
             //schaut ob die taste gedrückt oder losgelassen wird
@@ -52,16 +61,16 @@ public class Keypress {
 
             if (!matched){
                 oldInput.add(input);
-                int[] key = preset.getKey(input);
+                int[] key = preset.getKey(input, macropad);
                 //sucht sich den Hexcode aus den presets
 
                 switch (key[ 0 ]) {
                     case 0:
-                        Macropadmain.presetswichdialog();
+                        macropad.presetswichdialog();
                         break;
                     //cases with a key pressed
                     case KeyEvent.VK_NUM_LOCK:
-                        Macropadmain.switchnumlock();
+                        macropad.switchnumlock();
                     default:
                         //drückt alle tasten
                         press(key);

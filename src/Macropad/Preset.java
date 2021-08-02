@@ -10,10 +10,12 @@ public class Preset {
     //https://docs.oracle.com/javase/7/docs/api/java/awt/event/KeyEvent.html
     private final ArrayList<HashMap<Integer, ArrayList<Integer>>> presets = new ArrayList<>();
 
-    
 
+    public Preset() {
+        this(System.getProperty("os.name").toLowerCase());
+    }
 
-    public Preset(String os ) {
+    public Preset(String os) {
 
         //In array form auch mit  Array als rückgabe wert
         //bruh initialisierung 100
@@ -224,22 +226,22 @@ public class Preset {
 
     }
 
-    public int[] getKey(int input){
-        if (Macropadmain.getPreset() == 3 | Macropadmain.getPreset() == 4  ){
-            Macropadmain.testnumlock(false);
+    public int[] getKey(int input, Macropad macropad) {
+        if (macropad.getPreset() == 3 | macropad.getPreset() == 4  ){
+            macropad.testnumlock(false);
         }
 
-        int [] list = new int[ presets.get(Macropadmain.getPreset() - 1).get(input).size()];
+        int [] list = new int[ presets.get(macropad.getPreset() - 1).get(input).size()];
         for (int i = 0; i < list.length; i++) {
-           list[i] =  presets.get(Macropadmain.getPreset() - 1).get(input).get(i);
+           list[i] =  presets.get(macropad.getPreset() - 1).get(input).get(i);
         }
         return list ;
     }
 
 
 
-    public HashMap<Integer, ArrayList<Integer>> getActivePreset(){
-        return presets.get(Macropadmain.getPreset());
+    public HashMap<Integer, ArrayList<Integer>> getActivePreset(Macropad macropad){
+        return presets.get(macropad.getPreset());
     }
     public int  getgesamtpresets(){
         return presets.size();
