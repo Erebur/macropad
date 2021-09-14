@@ -1,15 +1,26 @@
 package Testing;
 
+import Macropad.Macropad;
 import com.fazecast.jSerialComm.SerialPort;
 
-import javax.swing.*;
 import java.awt.*;
-import java.util.Arrays;
 
 public class Test{
     public static void main(String[] args) throws AWTException {
-        Integer  p = null;
-        p = Integer.parseInt(JOptionPane.showInputDialog(null, Arrays.toString(SerialPort.getCommPorts())));
+        //testing the device
+        try {
+            int port = Macropad.autoPortSuchen();
+
+            SerialPort comPort = null;
+            comPort = SerialPort.getCommPorts()[ port ];
+            comPort.openPort();
+
+
+
+
+        }catch (Exception e ){
+            e.printStackTrace();
+        }
 
     }
 

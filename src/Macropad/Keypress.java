@@ -82,8 +82,9 @@ public class Keypress {
 
     private static int aufzahltesten(Scanner s) {
         String eingabe = s.nextLine() ;
-        int    input = 0 ;
-        //da es manchmal(Random lol) falsche eingaben gibt braucht man  fehlerkorrektur
+
+        int input = 0 ;
+        //da es manchmal(Random lol) falsche eingaben gibt braucht man fehlerkorrektur
 
         for (int i = 0; i < eingabe.length(); i++) {
             try {

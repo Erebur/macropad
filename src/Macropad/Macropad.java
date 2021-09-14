@@ -18,6 +18,7 @@ public class Macropad {
     //der Pfad der config datei die zum Speichern des presets genutzt wird
     private static final File CONFIG = Macropad.getConfig();
     private static final char TRENNZEICHEN = ':';
+    private static  final String OS = System.getProperty("os.name").toLowerCase();
 
 
     public Preset preset;
@@ -39,17 +40,19 @@ public class Macropad {
     }
 
     public Macropad() {
-        this(new Preset());
+        this(new Preset(Macropad.OS));
     }
 
     public void start() {
 
         //usereingabe des Ports
         // bei falscher eingabe wartet das programm ewig auf eingabe durch serial Port bekommt aber nie etwas -> das programm macht nicht und man kann nicht beenden (was ungünstig ist lol)
-        //TODO mit arduino den Port übergeben und automatisch richtig wählen lol
         if (port == -1){
             portSuchenDialog();
         }
+
+        //testing the device
+
 
 
         while (!exit) {
@@ -73,9 +76,24 @@ public class Macropad {
                 presetswichdialog();
             }
         }
-        //exit dialog
-        JOptionPane.showMessageDialog(null, "exited");
 
+        if (!testing()) {
+            System.out.println("can't get output from " + SerialPort.getCommPorts()[ port ].getSystemPortName() );
+        }else{
+            //exit dialog
+            JOptionPane.showMessageDialog(null, "exited");
+        }
+
+
+    }
+
+    private boolean testing() {
+
+        SerialPort comPort = null;
+        comPort = SerialPort.getCommPorts()[ port ];
+        comPort.openPort();
+
+        return comPort.bytesAvailable() != -1;
     }
 
     public void portSuchenDialog() {
@@ -267,8 +285,6 @@ public class Macropad {
 
 
 
-
-    //methoden zum Speichern in einer config
     public static int autoPortSuchen(){
         Object[] tmp =  SerialPort.getCommPorts();
         String[] ports = new String[ tmp.length];
@@ -286,6 +302,8 @@ public class Macropad {
     }
 
 
+    //methoden zum Speichern in einer config
+    
     //really useless
     protected static void writePort(int port) throws IOException {
 //        write("portsAlt" , Integer.valueOf(Arrays.toString(SerialPort.getCommPorts())));
@@ -306,8 +324,6 @@ public class Macropad {
         }
         return port;
     }
-
-
 
     private static File getConfig() {
         String os = System.getProperty("os.name").toLowerCase();
@@ -347,15 +363,12 @@ public class Macropad {
 
         fr.close();
         configScanner.close();
-
         return daten;
     }
 
 
     private static void write(String suchen , Integer schreiben ) throws IOException {
-
         LinkedHashMap<String, Integer> daten = read();
-
 
         if (daten.containsKey(suchen)){
             daten.replace(suchen , schreiben);
@@ -370,16 +383,10 @@ public class Macropad {
             neu.append(String.format("%s:%s\n", s, daten.get(s)));
         }
 
-
         PrintWriter pw = new PrintWriter(new FileWriter(CONFIG));
         pw.write(String.valueOf(neu));
         pw.close();
-
-
-
     }
-
-
 
     //key = reihenfolge // String = die bezeichnung // boolean special (oder setPreset) // nummer der aktion
      public static ArrayList<ArrayList<Object>> presets = new ArrayList<>() {{
@@ -420,5 +427,4 @@ public class Macropad {
             add(1);
         }});
     }};
-
 }

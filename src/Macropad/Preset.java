@@ -116,7 +116,6 @@ public class Preset {
 
                 replace(11 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_NUMPAD4);}});
                 replace(12 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_NUMPAD6);}});
-
             }});
 
 
@@ -130,14 +129,13 @@ public class Preset {
                 put(2 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_SHIFT);add(KeyEvent.VK_F1);}});
                 put(3 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_SHIFT);add(KeyEvent.VK_F2);}});
                 put(4 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_SHIFT);add(KeyEvent.VK_F3);}});
-                put(5 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_SHIFT);add(KeyEvent.VK_0);}});
+                put(5 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_SHIFT);add(KeyEvent.VK_F4);}});
                 //reihe 2
-
-                put(6 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_SHIFT);add(KeyEvent.VK_F4);}});
-                put(7 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_SHIFT);add(KeyEvent.VK_F5);}});
-                put(8 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_SHIFT);add(KeyEvent.VK_F6);}});
+                put(6 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_SHIFT);add(KeyEvent.VK_F5);}});
+                put(7 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_SHIFT);add(KeyEvent.VK_F6);}});
+                put(8 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_SHIFT);add(KeyEvent.VK_F7);}});
                 put(9 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_SHIFT);add(KeyEvent.VK_MINUS);}});
-                //reihe 4
+                //reihe 3
                 put(10 , new ArrayList<>(){{add(0);}});
                 put(11 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_LEFT);}});
                 put(12 , new ArrayList<>(){{add(KeyEvent.VK_CONTROL);add(KeyEvent.VK_ALT);add(KeyEvent.VK_RIGHT);}});
