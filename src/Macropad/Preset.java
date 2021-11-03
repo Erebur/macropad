@@ -241,6 +241,7 @@ public class Preset {
     public HashMap<Integer, ArrayList<Integer>> getActivePreset(Macropad macropad){
         return presets.get(macropad.getPreset());
     }
+
     public int  getgesamtpresets(){
         return presets.size();
     }

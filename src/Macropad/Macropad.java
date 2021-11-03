@@ -18,7 +18,7 @@ public class Macropad {
     //der Pfad der config datei die zum Speichern des presets genutzt wird
     private static final File CONFIG = Macropad.getConfig();
     private static final char TRENNZEICHEN = ':';
-    private static  final String OS = System.getProperty("os.name").toLowerCase();
+    private static final String OS = System.getProperty("os.name").toLowerCase();
 
 
     public Preset preset;
@@ -320,21 +320,25 @@ public class Macropad {
         try {
             port = Objects.requireNonNull(read("preset"));
         } catch (IOException e) {
-            e.printStackTrace();
+            debug(e.getMessage());
         }
         return port;
     }
 
-    private static File getConfig() {
-        String os = System.getProperty("os.name").toLowerCase();
-        //TODO relative Pfade
-
-        if (os.contains("linux")){
-            return  new File("/home/erebur/Documents/Programmieren/eigengebrauch/macropad/config");
-        }else if(os.contains("win")){
-            return  new File("C:\\Users\\simon\\OneDrive\\Dokumente\\Programmieren\\eigengebrauch\\macropad\\config");
+    private static File getConfig(){
+        File confDir = new File(String.join(System.getProperty("file.separator") ,System.getProperty("user.home"),".config" , "macropad"));
+        if (!confDir.exists()){
+            debug(String.format("folder was created %s",confDir.mkdirs()));
         }
-        return new File("./config");
+        File conf = new File(String.join(System.getProperty("file.separator") , confDir.getAbsolutePath() ,"macropad.conf" )) ;
+        if (!conf.exists()){
+            try (FileWriter fr = new FileWriter(conf)) {
+                fr.write("preset:0\n"+"port:1\n");
+            } catch (IOException e) {
+                debug("could not create conf file");
+            }
+        }
+        return conf;
     }
 
     private static Integer read(String suchen) throws IOException {

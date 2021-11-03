@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 public class Keypress {
 
-    private Preset preset;
+    private final Preset preset;
     private final SerialPort comPort;
     private final Macropad macropad ;
 
