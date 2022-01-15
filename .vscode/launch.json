@@ -1,0 +1,42 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Launch Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "Launch GUI",
+            "request": "launch",
+            "mainClass": "GUI",
+            "projectName": "macropad_de365a69"
+        },
+        {
+            "type": "java",
+            "name": "Launch Macropad",
+            "request": "launch",
+            "mainClass": "Macropad.Macropad",
+            "projectName": "macropad_de365a69"
+        },
+        {
+            "type": "java",
+            "name": "Launch Pad",
+            "request": "launch",
+            "mainClass": "Macropad.Pad",
+            "projectName": "macropad_de365a69"
+        },
+        {
+            "type": "java",
+            "name": "Launch Test",
+            "request": "launch",
+            "mainClass": "Testing.Test",
+            "projectName": "macropad_de365a69"
+        }
+    ]
+}

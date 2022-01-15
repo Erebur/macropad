@@ -42,6 +42,17 @@ public class Macropad {
     public Macropad() {
         this(new Preset(Macropad.OS));
     }
+    public static void main(String[] args){
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("com.sun.java.swing.plaf.gtk.GTKLookAndFeel".equals(info.getClassName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception e) {}
+        new Macropad().start();
+    }
 
     public void start() {
 
@@ -292,7 +303,7 @@ public class Macropad {
             ports[i] = tmp[i].toString();
         }
 
-        for (int i = 0, portsLength = ports.length; i < portsLength; i++) {
+        for (int i = 0; i < ports.length; i++) {
             String port = ports[ i ];
             if (port.equals("USB2.0-Serial") | port.contains("ch341")) {
                 return i;
@@ -333,7 +344,7 @@ public class Macropad {
         File conf = new File(String.join(System.getProperty("file.separator") , confDir.getAbsolutePath() ,"macropad.conf" )) ;
         if (!conf.exists()){
             try (FileWriter fr = new FileWriter(conf)) {
-                fr.write("preset:0\n"+"port:1\n");
+                fr.write("preset:1\n"+"port:1\n");
             } catch (IOException e) {
                 debug("could not create conf file");
             }
