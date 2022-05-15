@@ -9,7 +9,7 @@ public class Preset {
 
     // https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
     // https://docs.oracle.com/javase/7/docs/api/java/awt/event/KeyEvent.html
-    private final ArrayList<HashMap<Integer, ArrayList<Integer>>> presets = new ArrayList<>();
+    public final ArrayList<HashMap<Integer, ArrayList<Integer>>> presets = new ArrayList<>();
 
     public Preset() {
         this(System.getProperty("os.name").toLowerCase());
@@ -404,7 +404,6 @@ public class Preset {
                     });
                 }
             });
-
             return;
         }
         if (os.equals("linux")) {
@@ -823,6 +822,7 @@ public class Preset {
 
                 }
             });
+            return;
         }
         throw new NoSuchElementException();
     }
@@ -843,7 +843,7 @@ public class Preset {
         return presets.get(macropad.getPreset());
     }
 
-    public int getgesamtpresets() {
+    public int getPresetSize() {
         return presets.size();
     }
 
