@@ -27,7 +27,6 @@ public class Macropad {
     private boolean exit;
 
     public Macropad() {
-//        todo
         this.exit = false;
         this.numLock = Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_NUM_LOCK);
         this.presetSwitchDialog = true;
@@ -48,11 +47,15 @@ public class Macropad {
         new Macropad().start();
     }
 
-    private static int aufzahltesten(Scanner s) {
-        String eingabe = s.nextLine();
+    /**
+     * don't no why but we need error correction
+     * @param scanner reads the next line from the scanner and
+     * @return a number
+     */
+    private static int testForNumber(Scanner scanner) {
+        String eingabe = scanner.nextLine();
 
         int input = 0;
-        //da es manchmal(Random lol) falsche eingaben gibt braucht man fehlerkorrektur
 
         for (int i = 0; i < eingabe.length(); i++) {
             try {
@@ -72,10 +75,7 @@ public class Macropad {
 
     @SuppressWarnings("ConstantConditions")
     public static void debug(String errorMessage, boolean formating) {
-        String errorFormated = errorMessage;
-        if (formating) {
-            errorFormated = String.format("%s\n", errorMessage);
-        }
+        String errorFormated = formating ? String.format("%s\n", errorMessage) : errorMessage;
         //0 aus // 1 console // 2 pop up // 3 (1 + 2)
         switch (DEBUG_LEVEL) {
             case 1 -> System.out.print(errorFormated);
@@ -128,42 +128,31 @@ public class Macropad {
                 ArrayList<Integer> oldInput = new ArrayList<>();
                 while (!exit) {
 
+
                     Scanner s = new Scanner(comPort.getInputStream());
 //                  Waiting for input
                     while (comPort.bytesAvailable() == 0) {
                         //noinspection BusyWait
                         sleep(20);
                     }
-                    var input = aufzahltesten(s);
-                    Macropad.debug(String.valueOf(input), false);
+                    var input = testForNumber(s);
+                    Command command = new Command(CONFIG.getCommands().get(presetNr).get(input - 2));
 
                     boolean matched = false;
-//                  Durchsucht die Liste von Alten inputs
+//                  Allows to release a command e.g. a Keypress
                     for (int i = 0; i < oldInput.size(); i++) {
                         if (input == oldInput.get(i)) {
                             oldInput.remove(i);
                             i--;
                             matched = true;
+                            command.release(this);
                         }
                     }
 
                     if (!matched) {
+                        debug(String.valueOf(input));
                         oldInput.add(input);
-                        String command = CONFIG.getCommands().get(presetNr).get(input - 2);
-                        try {
-                            //noinspection SwitchStatementWithTooFewBranches
-                            switch (command) {
-                                case "M_PresetChange" -> presetswichdialog();
-                                default -> {
-                                    try {
-                                        Process process = Runtime.getRuntime().exec(command);
-                                    } catch (Throwable ignored) {
-                                    }
-                                }
-                            }
-                        } catch (NullPointerException ignored) {
-//                            would throw when no command is specified in
-                        }
+                        command.execute(this);
                     }
                 }
 
@@ -239,26 +228,21 @@ public class Macropad {
     //Dialoge
     void presetswichdialog() {
         ArrayList<String> possibilities = CONFIG.getPresetNames();
+        possibilities.add("Exit");
 
         if (isPresetswitchdialog()) {
             String gewaehltesPreset = (String) JOptionPane
-                    .showInputDialog(null, String.format("Preset wählen (aktuell = %s )", CONFIG.getCommands().get(presetNr)), "Preset", JOptionPane.QUESTION_MESSAGE, null, possibilities.toArray(), "1");
+                    .showInputDialog(null, String.format("Preset wählen (aktuell = %s )", CONFIG.getPresetNames().get(presetNr)), "Preset", JOptionPane.QUESTION_MESSAGE, null, possibilities.toArray(), "1");
 
 
-            debug(gewaehltesPreset);
+            debug(gewaehltesPreset +(gewaehltesPreset != null ? String.valueOf(possibilities.indexOf(gewaehltesPreset)) : "presetswichdialog abgebrochen, " + getPreset()));
 
-            if (gewaehltesPreset != null) {
-                debug(String.valueOf(possibilities.indexOf(gewaehltesPreset)));
-            } else {
-                debug("presetswichdialog abgebrochen, " + getPreset());
-            }
 
         } else {
-            if (getPreset() >= CONFIG.getCommands().size()) {
+            if (getPreset() >= CONFIG.getCommands().size())
                 setPreset(1);
-            } else {
+            else
                 setPreset(getPreset() + 1);
-            }
         }
 
     }
