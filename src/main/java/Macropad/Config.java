@@ -19,21 +19,23 @@ import static Macropad.Macropad.debug;
 public class Config {
     private int preset;
     private int port;
+    private int debugLevel;
     private ArrayList<ArrayList<String>> commands;
     //    todo
     private ArrayList<String> presetNames;
 
-    public Config(int preset, int port) {
+    public Config(int preset, int port, int debugLevel) {
         this.commands = new ArrayList<>() {{
             add(new ArrayList<>());
         }};
         this.presetNames = new ArrayList<>();
         this.preset = preset;
         this.port = port;
+        this.debugLevel = debugLevel;
     }
 
     public Config() {
-        this(1, 1);
+        this(1, 1,1);
     }
 
     @SneakyThrows
