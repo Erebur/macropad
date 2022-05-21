@@ -13,7 +13,6 @@
           <archive>
             <manifest>
               <mainClass>Macropad.Pad</mainClass>
-              <addClasspath>true</addClasspath>
             </manifest>
           </archive>
         </configuration>

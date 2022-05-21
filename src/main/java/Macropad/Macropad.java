@@ -10,7 +10,6 @@ import java.util.Scanner;
 
 import static java.lang.Thread.sleep;
 
-@SuppressWarnings("BusyWait")
 public class Macropad {
 
     //0 aus // 1 console // 2 pop up // 3 (1 + 2)
@@ -18,10 +17,11 @@ public class Macropad {
     private static int debugLevel;
     private final Config config;
     private int presetNr;
-    //wird versucht automatisch dem Port zu suchen (error = -1 )
     private int port;
     private final boolean presetSwitchDialog;
     private boolean exit;
+    //Offset because Arduino wiring is slightly off
+    public int offset;
 
     public Macropad() {
 //        todo use parameters
@@ -31,9 +31,10 @@ public class Macropad {
         this.port = portSearch();
         this.presetNr = config.getPreset() - 1;
         debugLevel = config.getDebugLevel();
+        offset = config.getOffset();
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("com.sun.java.swing.plaf.gtk.GTKLookAndFeel".equals(info.getClassName())) {
@@ -109,7 +110,7 @@ public class Macropad {
         return -1;
     }
 
-    public void start() throws InterruptedException {
+    public void start() {
 
         // bei falscher eingabe wartet das programm ewig auf eingabe durch serial Port bekommt aber nie etwas -> das programm macht nicht und man kann nicht beenden (was ungünstig ist lol)
         if (port == -1) {
@@ -119,7 +120,7 @@ public class Macropad {
         //testing the device
 
         while (!exit) {
-            SerialPort comPort = null;
+            SerialPort comPort;
             //serial port reader
 
             debug("Started");
@@ -136,7 +137,7 @@ public class Macropad {
                     if (comPort.bytesAvailable() != 0) break;
                 }
                 var input = nextNumber(s);
-                Command command = new Command(config.getCommands().get(presetNr).get(input - 2));
+                Command command = new Command(config.getCommands().get(presetNr).get(input - 1 + offset));
 
 
 //                  Allows to release a command e.g. a Keypress
@@ -155,15 +156,6 @@ public class Macropad {
         }
 
         debug("exited");
-    }
-
-    private boolean portTest() {
-
-        SerialPort comPort = null;
-        comPort = SerialPort.getCommPorts()[port];
-        comPort.openPort();
-
-        return comPort.bytesAvailable() != -1;
     }
 
     public void portSuchenDialog() {

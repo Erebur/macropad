@@ -20,8 +20,8 @@ public class Config {
     private int preset;
     private int port;
     private int debugLevel;
+    private int offset;
     private ArrayList<ArrayList<String>> commands;
-    //    todo
     private ArrayList<String> presetNames;
 
     public Config(int preset, int port, int debugLevel) {

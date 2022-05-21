@@ -50,8 +50,7 @@
             <configuration>
                 <archive>
                     <manifest>
-                        <mainClass>Macropad.Pad</mainClass>
-                        <addClasspath>true</addClasspath>
+                        <mainClass>Macropad.Macropad</mainClass>
                     </manifest>
                 </archive>
             </configuration>
