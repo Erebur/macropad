@@ -3,8 +3,6 @@ package Macropad;
 import com.fazecast.jSerialComm.SerialPort;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
@@ -23,33 +21,30 @@ public class Macropad {
     //wird versucht automatisch dem Port zu suchen (error = -1 )
     private int port;
     private final boolean presetSwitchDialog;
-    private final boolean numLock;
     private boolean exit;
 
     public Macropad() {
 //        todo use parameters
         this.config = Config.getConfig();
-
         this.exit = false;
-        this.numLock = Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_NUM_LOCK);
         this.presetSwitchDialog = true;
         this.port = portSearch();
         this.presetNr = config.getPreset() - 1;
         debugLevel = config.getDebugLevel();
     }
 
-//    public static void main(String[] args) throws InterruptedException {
-//        try {
-//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-//                if ("com.sun.java.swing.plaf.gtk.GTKLookAndFeel".equals(info.getClassName())) {
-//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-//                    break;
-//                }
-//            }
-//        } catch (Exception ignored) {
-//        }
-//        new Macropad().start();
-//    }
+    public static void main(String[] args) throws InterruptedException {
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("com.sun.java.swing.plaf.gtk.GTKLookAndFeel".equals(info.getClassName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        new Macropad().start();
+    }
 
     /**
      * don't no why but we need error correction
