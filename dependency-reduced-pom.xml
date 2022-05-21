@@ -12,7 +12,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>Macropad.Pad</mainClass>
+              <mainClass>Macropad.Macropad</mainClass>
             </manifest>
           </archive>
         </configuration>

@@ -1,6 +1,7 @@
 package Macropad;
 
 import com.fazecast.jSerialComm.SerialPort;
+import lombok.SneakyThrows;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -110,6 +111,7 @@ public class Macropad {
         return -1;
     }
 
+    @SneakyThrows
     public void start() {
 
         // bei falscher eingabe wartet das programm ewig auf eingabe durch serial Port bekommt aber nie etwas -> das programm macht nicht und man kann nicht beenden (was ungünstig ist lol)
@@ -133,9 +135,10 @@ public class Macropad {
             while (!exit) {
                 Scanner s = new Scanner(comPort.getInputStream());
 //                  Waiting for input
-                while (true) {
-                    if (comPort.bytesAvailable() != 0) break;
-                }
+                while (comPort.bytesAvailable() == 0)
+//                  the shorter you wait the more cpu usage u have
+                    //noinspection BusyWait
+                    sleep(20);
                 var input = nextNumber(s);
                 Command command = new Command(config.getCommands().get(presetNr).get(input - 1 + offset));
 
