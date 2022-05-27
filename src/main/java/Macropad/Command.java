@@ -24,30 +24,20 @@ public class Command {
 
     public void execute(Macropad macropad) {
         try {
-            switch (command.substring(0,2)) {
+            switch (command.substring(0, 2)) {
                 case "MA" -> {
                     //todo implement check for this / multiple options
                     macropad.presetswichdialog();
                 }
                 case "KS" -> {
-                    new Thread(() -> {
-                        try {
-                            String[] strokes = command.substring(3).split("\\+");
-                            Robot robot = new Robot();
-                            for (String stroke : strokes) {
-                                robot.keyPress(KeyStroke.getKeyStroke(stroke).getKeyCode());
-                            }
-                            for (String stroke : strokes) {
-                                robot.keyRelease(KeyStroke.getKeyStroke(stroke).getKeyCode());
-                            }
-                        } catch (AWTException ignored) {}
-                    }).start();
+                    String[] strokes = command.substring(3).split("\\+");
+                    Robot robot = new Robot();
+                    for (String stroke : strokes)
+                        robot.keyPress(KeyStroke.getKeyStroke(stroke).getKeyCode());
+                    for (String stroke : strokes)
+                        robot.keyRelease(KeyStroke.getKeyStroke(stroke).getKeyCode());
                 }
-                default -> {
-                    try {
-                        Runtime.getRuntime().exec(command.startsWith("CL") ? command.substring(3) : command);
-                    } catch (Throwable ignored) {}
-                }
+                default -> Runtime.getRuntime().exec(command.startsWith("CL") ? command.substring(3) : command);
             }
             {
                 JOptionPane pane = new JOptionPane("test");
@@ -58,7 +48,7 @@ public class Command {
                 timer.setRepeats(false);
                 timer.start();
             }
-        }catch (Throwable ignored){}
+        } catch (Throwable ignored) {}
 
     }
 }

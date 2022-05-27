@@ -25,7 +25,6 @@ public class Macropad {
     public int offset;
 
     public Macropad() {
-//        todo use parameters
         this.config = Config.getConfig();
         this.exit = false;
         this.presetSwitchDialog = true;
@@ -51,7 +50,7 @@ public class Macropad {
     /**
      * don't no why but we need error correction
      *
-     * @param scanner reads the next line from the scanner and
+     * @param scanner reads the next line and
      * @return a number
      */
     private static int nextNumber(Scanner scanner) {
@@ -147,14 +146,14 @@ public class Macropad {
                 for (int i = 0; i < oldInput.size(); i++) {
                     if (input == oldInput.get(i)) {
                         oldInput.remove(i);
-                        command.release(this);
+                        new Thread(() -> command.release(this)).start();
                         continue execCMD;
                     }
                 }
 
                 debug(String.valueOf(input));
                 oldInput.add(input);
-                command.execute(this);
+                new Thread(() -> command.execute(this)).start();
             }
         }
 

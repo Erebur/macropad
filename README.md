@@ -16,3 +16,4 @@ This is a small Java application that connects to a Arduino
 - parameterize the config and other options 
 - add multiple java internal commands  
 - popup to show th new volume/new song/mute status 
+- popup to show the return value of a command
