@@ -1,5 +1,7 @@
-# Macropad 
+# Macropad
 This is a small Java application that connects to a Arduino
+
+---
 ## How it works 
 - The Arduino sends the number of the Pressed Button
 - The Java Programm executes the corresponding command
@@ -9,3 +11,8 @@ This is a small Java application that connects to a Arduino
 - not possible to print the same Key multiple times by one command
 ## Config
 - Saved in ~/.config/macropad/macropad.conf
+## TODO
+- ability to paste complete sentences
+- parameterize the config and other options 
+- add multiple java internal commands  
+- popup to show th new volume/new song/mute status 
