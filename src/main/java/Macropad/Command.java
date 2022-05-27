@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.swing.*;
+import java.awt.*;
 
 @Getter
 @Setter
@@ -25,15 +26,26 @@ public class Command {
         try {
             switch (command.substring(0,2)) {
                 case "MA" -> {
-                    //todo implement check for this
+                    //todo implement check for this / multiple options
                     macropad.presetswichdialog();
                 }
-                case "KS" ->{
-                    //todo implement Keystrokes
+                case "KS" -> {
+                    new Thread(() -> {
+                        try {
+                            String[] strokes = command.substring(3).split("\\+");
+                            Robot robot = new Robot();
+                            for (String stroke : strokes) {
+                                robot.keyPress(KeyStroke.getKeyStroke(stroke).getKeyCode());
+                            }
+                            for (String stroke : strokes) {
+                                robot.keyRelease(KeyStroke.getKeyStroke(stroke).getKeyCode());
+                            }
+                        } catch (AWTException ignored) {}
+                    }).start();
                 }
                 default -> {
                     try {
-                        Process process = Runtime.getRuntime().exec(command);
+                        Runtime.getRuntime().exec(command.startsWith("CL") ? command.substring(3) : command);
                     } catch (Throwable ignored) {}
                 }
             }
