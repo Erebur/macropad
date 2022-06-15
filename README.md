@@ -12,8 +12,10 @@ This is a small Java application that connects to a Arduino
 ## Config
 - Saved in ~/.config/macropad/macropad.conf
 ## TODO
-- ability to paste complete sentences
-- parameterize the config and other options 
-- add multiple java internal commands  
-- popup to show th new volume/new song/mute status 
-- popup to show the return value of a command
+- [ ] ability to paste complete sentences
+- [ ] parameterize the config and other options 
+- [ ] add multiple java internal commands  
+- [ ] popup to show th new volume/new song/mute status 
+- [ ] popup to show the return value of a command
+- [ ] add config watcher and option to seamlessly update with new config 
+- [ ] option to create example config

@@ -124,7 +124,7 @@ public class Macropad {
             SerialPort comPort;
             //serial port reader
 
-            debug("Started");
+            debug("Started", 1);
             //öffnet den ausgewählten port
             comPort = SerialPort.getCommPorts()[port];
             comPort.openPort();
@@ -151,7 +151,7 @@ public class Macropad {
                     }
                 }
 
-                debug(String.valueOf(input));
+                debug(String.valueOf(input), 3);
                 oldInput.add(input);
                 new Thread(() -> command.execute(this)).start();
             }
@@ -163,23 +163,20 @@ public class Macropad {
     public void portSuchenDialog() {
         SerialPort comPort;
         String input;
-
         do {
             input = JOptionPane.showInputDialog(null, Arrays.toString(SerialPort.getCommPorts()));
-
-
             try {
                 port = Integer.parseInt(input);
                 comPort = SerialPort.getCommPorts()[port];
                 comPort.openPort();
                 config.setPort(port);
-                debug(String.format("Started with port %d and preset %d", port, presetNr));
+                debug(String.format("Started with port %d and preset %d", port, presetNr), 2);
                 comPort.closePort();
                 return;
             } catch (NumberFormatException e) {
-                debug("Bitte Nummer eingeben");
+                debug("Bitte Nummer eingeben", 1);
             } catch (Exception e) {
-                debug("Fehler" + e.getMessage());
+                debug("Fehler" + e.getMessage(), 1);
             }
             //solte tmp null sein wurde warscheinlich abgebrochen
         } while (input != null);
@@ -187,7 +184,7 @@ public class Macropad {
     }
 
     private void error(SerialPort comPort, Throwable e) {
-        debug(String.format("\t%s \n%s", "a error occurred restarting with 10sec delay", e.toString()));
+        debug(String.format("\t%s \n%s", "a error occurred restarting with 10sec delay", e.toString()), 1);
 
         if (comPort != null && comPort.isOpen()) {
             comPort.closePort();
@@ -205,24 +202,20 @@ public class Macropad {
 
         if (isPresetswitchdialog()) {
             ArrayList<String> possibilities = config.getPresetNames();
-            possibilities.add("exit");
 
 
-            String gewaehltesPreset = (String) JOptionPane
-                    .showInputDialog(null, String.format("Preset wählen (aktuell = %s )", config.getPresetNames().get(presetNr)), "Preset", JOptionPane.QUESTION_MESSAGE, null, possibilities.toArray(), "1");
+            String gewaehltesPreset = (String) JOptionPane.showInputDialog(null, String.format("Preset wählen (aktuell = %s )", config.getPresetNames().get(presetNr)), "Preset", JOptionPane.QUESTION_MESSAGE, null, possibilities.toArray(), "1");
 
 
-            debug("%s %s".formatted(gewaehltesPreset, gewaehltesPreset != null ? String.valueOf(possibilities.indexOf(gewaehltesPreset)) : "presetswichdialog abgebrochen, " + getPreset()));
+            debug("%s %s".formatted(gewaehltesPreset, gewaehltesPreset != null ? String.valueOf(possibilities.indexOf(gewaehltesPreset)) : "presetswichdialog abgebrochen, " + getPreset()), 2);
 
             exit = Objects.equals(gewaehltesPreset, "exit");
 
             possibilities.clear();
 
         } else {
-            if (getPreset() >= config.getCommands().size())
-                setPreset(1);
-            else
-                setPreset(getPreset() + 1);
+            if (getPreset() >= config.getCommands().size()) setPreset(1);
+            else setPreset(getPreset() + 1);
         }
     }
 
@@ -236,7 +229,7 @@ public class Macropad {
 
     public void setPreset(int presetNr) {
         this.presetNr = presetNr;
-        debug(String.format("preset=%d\n", getPreset()), false);
+        debug(String.format("preset = %d\n", getPreset()), false, 2);
     }
 
     public boolean isPresetswitchdialog() {

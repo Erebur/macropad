@@ -42,9 +42,7 @@ public class Command {
             {
                 JOptionPane pane = new JOptionPane("test");
                 pane.setVisible(true);
-                Timer timer = new Timer(90000, e -> {
-                    pane.setVisible(false);
-                });
+                Timer timer = new Timer(90000, e -> pane.setVisible(false));
                 timer.setRepeats(false);
                 timer.start();
             }
