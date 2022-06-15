@@ -16,25 +16,23 @@ import java.util.function.Consumer;
 @Setter
 public class Config {
     private int preset;
-    private int port;
     private int debugLevel;
     private int offset;
     private ArrayList<ArrayList<String>> commands;
     private String output_command;
     private ArrayList<String> presetNames;
 
-    public Config(int preset, int port, int debugLevel) {
+    public Config(int preset, int debugLevel) {
         this.commands = new ArrayList<>() {{
             add(new ArrayList<>());
         }};
         this.presetNames = new ArrayList<>();
         this.preset = preset;
-        this.port = port;
         this.debugLevel = debugLevel;
     }
 
     public Config() {
-        this(1, 1, 1);
+        this(1, 1);
     }
 
     @SneakyThrows
@@ -80,7 +78,7 @@ public class Config {
 //        TODO exception handling
         try {
             var title = "Macropad";
-            var commandList = new ArrayList<String>(Collections.singletonList(output_command.substring(0, output_command.indexOf(' '))));
+            var commandList = new ArrayList<>(Collections.singletonList(output_command.substring(0, output_command.indexOf(' '))));
             for (String s2 : output_command.substring(output_command.indexOf(' ') + 1).split(" ")) {
                 if (s2.equals("{msg}")) s2 = s;
                 if (s2.equals("{title}")) s2 = title;
