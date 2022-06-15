@@ -205,36 +205,21 @@ public class Macropad {
         if (Macropad.debugLevel >= debugLevel) config.log(errorFormated);
     }
 
-    private void error(SerialPort comPort, Throwable e) {
-        debug(String.format("\t%s \n%s", "a error occurred restarting with 10sec delay", e.toString()), 1);
-
-        if (comPort != null && comPort.isOpen()) {
-            comPort.closePort();
-        }
-        //10 sec
-        try {
-            sleep(10000);
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
-        }
-    }
-
     //Dialoge
-
     void presetswichdialog() {
-
         if (isPresetswitchdialog()) {
-            ArrayList<String> possibilities = config.getPresetNames();
+            @SuppressWarnings("unchecked")
+            ArrayList<String> possibilities = (ArrayList<String>) config.getPresetNames().clone();
+            possibilities.add("exit");
+            String gewaehltesPreset = (String) JOptionPane.showInputDialog(null, String.format("Preset wählen (aktuell = %s )", config.getPresetNames().get(getPreset())), "Preset", JOptionPane.QUESTION_MESSAGE, null, possibilities.toArray(), "1");
 
-            String gewaehltesPreset = (String) JOptionPane.showInputDialog(null, String.format("Preset wählen (aktuell = %s )", config.getPresetNames().get(presetNr)), "Preset", JOptionPane.QUESTION_MESSAGE, null, possibilities.toArray(), "1");
-
-            debug("%s %s".formatted(gewaehltesPreset, gewaehltesPreset != null ? String.valueOf(possibilities.indexOf(gewaehltesPreset)) : "presetswichdialog abgebrochen, " + getPreset()), 2);
+            debug("%s".formatted(gewaehltesPreset != null ? gewaehltesPreset : "presetswichdialog abgebrochen, " + getPreset()), 2);
 
             if (Objects.equals(gewaehltesPreset, "exit"))
                 stop();
-
+            else
+                setPreset(possibilities.indexOf(gewaehltesPreset));
             possibilities.clear();
-
         } else {
             if (getPreset() >= config.getCommands().size()) setPreset(1);
             else setPreset(getPreset() + 1);
