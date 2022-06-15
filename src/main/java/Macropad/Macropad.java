@@ -1,43 +1,36 @@
 package Macropad;
 
 import com.fazecast.jSerialComm.SerialPort;
-import lombok.SneakyThrows;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.swing.*;
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 
 import static java.lang.Thread.sleep;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 public class Macropad {
-    private static int debugLevel;
-    private volatile Config config;
     private final boolean presetSwitchDialog;
     //Offset because Arduino wiring is slightly off
-    public int offset;
-    private int presetNr;
+    @Getter
+    @Setter
     private int port;
-    private boolean exit;
+    private volatile Config config;
     private Thread main;
     private Thread fileWatcher;
     private SerialPort comPort;
 
     public Macropad() {
         this.presetSwitchDialog = true;
+        this.port = portSearch();
         try {
             this.config = Config.getConfig();
-            this.port = portSearch();
-            this.presetNr = config.getPreset() - 1;
-            debugLevel = config.getDebugLevel();
-            offset = config.getOffset();
-        }catch (Throwable e){
+        } catch (Throwable e) {
             stop();
-            debug("Config faulty" , 1);
+            debug("Config faulty", 1);
         }
     }
 
@@ -57,15 +50,14 @@ public class Macropad {
 
     public void init() {
         // bei falscher eingabe wartet das programm ewig auf eingabe durch serial Port bekommt aber nie etwas -> das programm macht nicht und man kann nicht beenden (was ungünstig ist lol)
-        if (port == -1) {
-            portSuchenDialog();
+        if (getPort() == -1) {
+            portSearchDialog();
         }
 
-        comPort = SerialPort.getCommPorts()[port];
+        comPort = SerialPort.getCommPorts()[getPort()];
         comPort.openPort();
         debug("Started", 1);
         main = new Thread(this::macropad);
-
         fileWatcher = new Thread(this::fileWatcher);
 
         main.start();
@@ -77,24 +69,25 @@ public class Macropad {
      */
     public void macropad() {
         ArrayList<Integer> oldInput = new ArrayList<>();
-        Thread thisThread = Thread.currentThread();
         execCMD:
-        while (main == thisThread) {
+        while (true) {
             Scanner s = new Scanner(comPort.getInputStream());
             while (comPort.bytesAvailable() == 0) {
 //                the shorter you wait the more cpu usage u have
                 try {
                     //noinspection BusyWait
                     sleep(20);
-                } catch (InterruptedException ignored) {}
+                } catch (InterruptedException e) {
+                    break execCMD;
+                }
             }
             var input = nextNumber(s);
-            if (!(config.getCommands().get(getPreset()).size() -1 >= input - 1 + offset)){
-                debug("command not found" , 1 );
+            if (!(config.getCommands().get(getPreset()).size() - 1 >= input - 1 + config.getOffset())) {
+                debug("command not found", 1);
 //                remove the next number from query
                 continue execCMD;
             }
-            Command command = new Command(config.getCommands().get(getPreset()).get(input - 1 + offset));
+            Command command = new Command(config.getCommands().get(getPreset()).get(input - 1 + config.getOffset()));
 //              Allows to release a command e.g. a Keypress
             for (int i = 0; i < oldInput.size(); i++) {
                 if (input == oldInput.get(i)) {
@@ -104,7 +97,7 @@ public class Macropad {
                 }
             }
 
-            debug(String.valueOf(input), 3);
+            debug(String.valueOf(input-1), 3);
             oldInput.add(input);
             new Thread(() -> command.execute(this)).start();
         }
@@ -117,18 +110,21 @@ public class Macropad {
             watchService = FileSystems.getDefault().newWatchService();
             Path path = Path.of(String.join(System.getProperty("file.separator"), System.getProperty("user.home"), ".config", "macropad"));
             path.register(watchService, ENTRY_MODIFY);
-            
             while (fileWatcher == Thread.currentThread()) {
                 WatchKey key;
-                key = watchService.take();
+                try {
+                    key = watchService.take();
+                }catch (InterruptedException e){
+                    break;
+                }
 
                 for (WatchEvent<?> event : key.pollEvents()) {
                     // The filename is the
                     // context of the event.
                     @SuppressWarnings("unchecked") WatchEvent<Path> ev = (WatchEvent<Path>) event;
                     Path filename = ev.context();
-//                the first event name ends with ~
-//                IDK why though
+//                  the first event name ends with ~
+//                  IDK why though
                     if (filename.toString().equals("macropad.conf~")) {
                         reload();
                     }
@@ -138,32 +134,63 @@ public class Macropad {
                     }
                 }
             }
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     public void stop() {
+        fileWatcher.interrupt();
+        main.interrupt();
         main = null;
         fileWatcher = null;
+        comPort.closePort();
     }
 
     private void reload() {
-        debug("Trying reload" , 1);
+        debug("Trying reload", 1);
         try {
             config = Config.getConfig();
-            debug("Reloaded" , 1);
-        }catch (Throwable e){
-            debug("Config faulty" , 1);
+            debug("Reloaded", 1);
+        } catch (Throwable e) {
+            debug("Config faulty", 1);
         }
     }
+
+    void debug(String message, int debugLevel) {
+        debug(message, true, debugLevel);
+    }
+
+    public void debug(String message, boolean formatting, int debugLevel) {
+        String errorFormated = formatting ? String.format("%s\n", message) : message;
+        if (config.getDebugLevel() >= debugLevel) config.log(errorFormated);
+    }
+
+    //Dialoge
+    void presetSwitchDialog() {
+        if (isPresetswitchdialog()) {
+            @SuppressWarnings("unchecked") ArrayList<String> possibilities = (ArrayList<String>) config.getPresetNames().clone();
+            possibilities.add("exit");
+            String gewaehltesPreset = (String) JOptionPane.showInputDialog(null, String.format("Preset wählen (aktuell = %s )", config.getPresetNames().get(getPreset())), "Preset", JOptionPane.QUESTION_MESSAGE, null, possibilities.toArray(), "1");
+
+            debug("Preset Switch Dialog: %s".formatted(gewaehltesPreset != null ? gewaehltesPreset : "presetswichdialog abgebrochen, " + getPreset()), 2);
+
+            if (Objects.equals(gewaehltesPreset, "exit")) stop();
+            else setPreset(possibilities.indexOf(gewaehltesPreset));
+            possibilities.clear();
+        } else {
+            if (getPreset() >= config.getCommands().size()) setPreset(1);
+            else setPreset(getPreset() + 1);
+        }
+    }
+
     /**
      * don't no why but we need error correction
      *
      * @param scanner reads the next line and
      * @return a number
      */
-    private static int nextNumber(Scanner scanner) {
+    private static int nextNumber(Scanner scanner) throws NoSuchElementException {
         String eingabe = scanner.nextLine();
         int input = 0;
         for (int i = 0; i < eingabe.length(); i++) {
@@ -196,47 +223,16 @@ public class Macropad {
         return -1;
     }
 
-    void debug(String message, int debugLevel) {
-        debug(message, true, debugLevel);
-    }
-
-    public void debug(String message, boolean formatting, int debugLevel) {
-        String errorFormated = formatting ? String.format("%s\n", message) : message;
-        if (Macropad.debugLevel >= debugLevel) config.log(errorFormated);
-    }
-
-    //Dialoge
-    void presetswichdialog() {
-        if (isPresetswitchdialog()) {
-            @SuppressWarnings("unchecked")
-            ArrayList<String> possibilities = (ArrayList<String>) config.getPresetNames().clone();
-            possibilities.add("exit");
-            String gewaehltesPreset = (String) JOptionPane.showInputDialog(null, String.format("Preset wählen (aktuell = %s )", config.getPresetNames().get(getPreset())), "Preset", JOptionPane.QUESTION_MESSAGE, null, possibilities.toArray(), "1");
-
-            debug("%s".formatted(gewaehltesPreset != null ? gewaehltesPreset : "presetswichdialog abgebrochen, " + getPreset()), 2);
-
-            if (Objects.equals(gewaehltesPreset, "exit"))
-                stop();
-            else
-                setPreset(possibilities.indexOf(gewaehltesPreset));
-            possibilities.clear();
-        } else {
-            if (getPreset() >= config.getCommands().size()) setPreset(1);
-            else setPreset(getPreset() + 1);
-        }
-    }
-
-    public void portSuchenDialog() {
+    public void portSearchDialog() {
         SerialPort comPort;
         String input;
         do {
             input = JOptionPane.showInputDialog(null, Arrays.toString(SerialPort.getCommPorts()));
             try {
-                port = Integer.parseInt(input);
-                comPort = SerialPort.getCommPorts()[port];
+                setPort(Integer.parseInt(input));
+                comPort = SerialPort.getCommPorts()[getPort()];
                 comPort.openPort();
-                config.setPort(port);
-                debug(String.format("Started with port %d and preset %d", port, presetNr), 2);
+                debug(String.format("Started with port %d and preset %d", getPort(), getPreset()), 2);
                 comPort.closePort();
                 return;
             } catch (NumberFormatException e) {
@@ -246,19 +242,15 @@ public class Macropad {
             }
             //solte tmp null sein wurde warscheinlich abgebrochen
         } while (input != null);
-        setExit(true);
-    }
-
-    public void setExit(boolean exit) {
-        this.exit = exit;
+        stop();
     }
 
     public int getPreset() {
-        return this.presetNr;
+        return config.getPreset() - 1;
     }
 
     public void setPreset(int presetNr) {
-        this.presetNr = presetNr;
+        config.setPreset(presetNr + 1);
         debug(String.format("preset = %d\n", getPreset()), false, 2);
     }
 

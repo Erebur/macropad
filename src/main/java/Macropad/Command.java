@@ -27,7 +27,7 @@ public class Command {
             switch (command.substring(0, 2)) {
                 case "MA" -> {
                     //todo implement check for this / multiple options
-                    macropad.presetswichdialog();
+                    macropad.presetSwitchDialog();
                 }
                 case "KS" -> {
                     String[] strokes = command.substring(3).split("\\+");
@@ -47,13 +47,13 @@ public class Command {
                 }
                 default -> Runtime.getRuntime().exec(command.startsWith("CL") ? command.substring(3) : command);
             }
-            {
-                JOptionPane pane = new JOptionPane("test");
-                pane.setVisible(true);
-                Timer timer = new Timer(90000, e -> pane.setVisible(false));
-                timer.setRepeats(false);
-                timer.start();
-            }
+//            {
+//                JOptionPane pane = new JOptionPane("test");
+//                pane.setVisible(true);
+//                Timer timer = new Timer(90000, e -> pane.setVisible(false));
+//                timer.setRepeats(false);
+//                timer.start();
+//            }
         } catch (Throwable ignored) {}
 
     }
