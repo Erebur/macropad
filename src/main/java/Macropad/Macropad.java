@@ -75,22 +75,26 @@ public class Macropad {
     /**
      * Main method that handels Button-presses
      */
-    @SneakyThrows
     public void macropad() {
         ArrayList<Integer> oldInput = new ArrayList<>();
         Thread thisThread = Thread.currentThread();
         execCMD:
         while (main == thisThread) {
             Scanner s = new Scanner(comPort.getInputStream());
-            while (comPort.bytesAvailable() == 0 ){
-//
+            while (comPort.bytesAvailable() == 0) {
 //                the shorter you wait the more cpu usage u have
-                //noinspection BusyWait
-                sleep(20);
+                try {
+                    //noinspection BusyWait
+                    sleep(20);
+                } catch (InterruptedException ignored) {}
             }
             var input = nextNumber(s);
-            Command command = new Command(config.getCommands().get(presetNr).get(input - 1 + offset));
-
+            if (!(config.getCommands().get(getPreset()).size() -1 >= input - 1 + offset)){
+                debug("command not found" , 1 );
+//                remove the next number from query
+                continue execCMD;
+            }
+            Command command = new Command(config.getCommands().get(getPreset()).get(input - 1 + offset));
 //              Allows to release a command e.g. a Keypress
             for (int i = 0; i < oldInput.size(); i++) {
                 if (input == oldInput.get(i)) {
