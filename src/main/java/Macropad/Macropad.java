@@ -15,26 +15,30 @@ import static java.lang.Thread.sleep;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 public class Macropad {
-    //0 aus // 1 console // 2 pop up // 3 (1 + 2)
     private static int debugLevel;
-    private final Config config;
+    private volatile Config config;
     private final boolean presetSwitchDialog;
     //Offset because Arduino wiring is slightly off
     public int offset;
     private int presetNr;
     private int port;
     private boolean exit;
-    private volatile Thread main;
+    private Thread main;
+    private Thread fileWatcher;
     private SerialPort comPort;
 
     public Macropad() {
-        this.config = Config.getConfig();
-        this.exit = false;
         this.presetSwitchDialog = true;
-        this.port = portSearch();
-        this.presetNr = config.getPreset() - 1;
-        debugLevel = config.getDebugLevel();
-        offset = config.getOffset();
+        try {
+            this.config = Config.getConfig();
+            this.port = portSearch();
+            this.presetNr = config.getPreset() - 1;
+            debugLevel = config.getDebugLevel();
+            offset = config.getOffset();
+        }catch (Throwable e){
+            stop();
+            debug("Config faulty" , 1);
+        }
     }
 
     public static void main(String[] args) {
@@ -51,6 +55,104 @@ public class Macropad {
         new Macropad().init();
     }
 
+    public void init() {
+        // bei falscher eingabe wartet das programm ewig auf eingabe durch serial Port bekommt aber nie etwas -> das programm macht nicht und man kann nicht beenden (was ungünstig ist lol)
+        if (port == -1) {
+            portSuchenDialog();
+        }
+
+        comPort = SerialPort.getCommPorts()[port];
+        comPort.openPort();
+        debug("Started", 1);
+        main = new Thread(this::macropad);
+
+        fileWatcher = new Thread(this::fileWatcher);
+
+        main.start();
+        fileWatcher.start();
+    }
+
+    /**
+     * Main method that handels Button-presses
+     */
+    @SneakyThrows
+    public void macropad() {
+        ArrayList<Integer> oldInput = new ArrayList<>();
+        Thread thisThread = Thread.currentThread();
+        execCMD:
+        while (main == thisThread) {
+            Scanner s = new Scanner(comPort.getInputStream());
+            while (comPort.bytesAvailable() == 0 ){
+//
+//                the shorter you wait the more cpu usage u have
+                //noinspection BusyWait
+                sleep(20);
+            }
+            var input = nextNumber(s);
+            Command command = new Command(config.getCommands().get(presetNr).get(input - 1 + offset));
+
+//              Allows to release a command e.g. a Keypress
+            for (int i = 0; i < oldInput.size(); i++) {
+                if (input == oldInput.get(i)) {
+                    oldInput.remove(i);
+                    new Thread(() -> command.release(this)).start();
+                    continue execCMD;
+                }
+            }
+
+            debug(String.valueOf(input), 3);
+            oldInput.add(input);
+            new Thread(() -> command.execute(this)).start();
+        }
+        debug("exited", 1);
+    }
+
+    private void fileWatcher() {
+        WatchService watchService;
+        try {
+            watchService = FileSystems.getDefault().newWatchService();
+            Path path = Path.of(String.join(System.getProperty("file.separator"), System.getProperty("user.home"), ".config", "macropad"));
+            path.register(watchService, ENTRY_MODIFY);
+            
+            while (fileWatcher == Thread.currentThread()) {
+                WatchKey key;
+                key = watchService.take();
+
+                for (WatchEvent<?> event : key.pollEvents()) {
+                    // The filename is the
+                    // context of the event.
+                    @SuppressWarnings("unchecked") WatchEvent<Path> ev = (WatchEvent<Path>) event;
+                    Path filename = ev.context();
+//                the first event name ends with ~
+//                IDK why though
+                    if (filename.toString().equals("macropad.conf~")) {
+                        reload();
+                    }
+                    boolean valid = key.reset();
+                    if (!valid) {
+                        break;
+                    }
+                }
+            }
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void stop() {
+        main = null;
+        fileWatcher = null;
+    }
+
+    private void reload() {
+        debug("Trying reload" , 1);
+        try {
+            config = Config.getConfig();
+            debug("Reloaded" , 1);
+        }catch (Throwable e){
+            debug("Config faulty" , 1);
+        }
+    }
     /**
      * don't no why but we need error correction
      *
@@ -90,100 +192,6 @@ public class Macropad {
         return -1;
     }
 
-    private void FileWatcher() {
-        WatchService watchService;
-        try {
-            watchService = FileSystems.getDefault().newWatchService();
-            Path path = Path.of(String.join(System.getProperty("file.separator"), System.getProperty("user.home"), ".config", "macropad"));
-            path.register(watchService, ENTRY_MODIFY);
-
-            for (; ; ) {
-                WatchKey key;
-                key = watchService.take();
-
-                for (WatchEvent<?> event : key.pollEvents()) {
-                    // The filename is the
-                    // context of the event.
-                    @SuppressWarnings("unchecked") WatchEvent<Path> ev = (WatchEvent<Path>) event;
-                    Path filename = ev.context();
-//                the first event name ends with ~
-//                IDK why though
-                    if (filename.toString().equals("macropad.conf~")) {
-                        System.out.println("Macropad Changed pls restart");
-                        restart();
-                    }
-                    boolean valid = key.reset();
-                    if (!valid) {
-                        break;
-                    }
-                }
-            }
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void init() {
-
-        // bei falscher eingabe wartet das programm ewig auf eingabe durch serial Port bekommt aber nie etwas -> das programm macht nicht und man kann nicht beenden (was ungünstig ist lol)
-        if (port == -1) {
-            portSuchenDialog();
-        }
-
-        comPort = SerialPort.getCommPorts()[port];
-        comPort.openPort();
-        debug("Started", 1);
-        main = new Thread(this::start);
-        Thread fileWatcher = new Thread(this::FileWatcher);
-
-        main.start();
-        fileWatcher.start();
-    }
-
-    /**
-     * Main method that handels Button-presses
-     */
-    @SneakyThrows
-    public void start() {
-        ArrayList<Integer> oldInput = new ArrayList<>();
-        Thread thisThread = Thread.currentThread();
-        execCMD:
-        while (!exit & main == thisThread) {
-            Scanner s = new Scanner(comPort.getInputStream());
-                /*
-                  the shorter you wait the more cpu usage u have
-                 */
-            while (comPort.bytesAvailable() == 0 & main == thisThread)
-                //noinspection BusyWait
-                sleep(20);
-            var input = nextNumber(s);
-            Command command = new Command(config.getCommands().get(presetNr).get(input - 1 + offset));
-
-//              Allows to release a command e.g. a Keypress
-            for (int i = 0; i < oldInput.size(); i++) {
-                if (input == oldInput.get(i)) {
-                    oldInput.remove(i);
-                    new Thread(() -> command.release(this)).start();
-                    continue execCMD;
-                }
-            }
-
-            debug(String.valueOf(input), 3);
-            oldInput.add(input);
-            new Thread(() -> command.execute(this)).start();
-        }
-
-        debug("exited", 1);
-    }
-
-    public void stop() {
-        main = null;
-    }
-
-    private void restart() {
-
-    }
-
     void debug(String message, int debugLevel) {
         debug(message, true, debugLevel);
     }
@@ -218,7 +226,8 @@ public class Macropad {
 
             debug("%s %s".formatted(gewaehltesPreset, gewaehltesPreset != null ? String.valueOf(possibilities.indexOf(gewaehltesPreset)) : "presetswichdialog abgebrochen, " + getPreset()), 2);
 
-            exit = Objects.equals(gewaehltesPreset, "exit");
+            if (Objects.equals(gewaehltesPreset, "exit"))
+                stop();
 
             possibilities.clear();
 
