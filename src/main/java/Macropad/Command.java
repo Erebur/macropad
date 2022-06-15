@@ -37,6 +37,14 @@ public class Command {
                     for (String stroke : strokes)
                         robot.keyRelease(KeyStroke.getKeyStroke(stroke).getKeyCode());
                 }
+                case "SE" -> {
+                    String[] strokes = command.substring(3).split("\\+");
+                    Robot robot = new Robot();
+                    for (String stroke : strokes){
+                        robot.keyPress(KeyStroke.getKeyStroke(stroke).getKeyCode());
+                        robot.keyRelease(KeyStroke.getKeyStroke(stroke).getKeyCode());
+                    }
+                }
                 default -> Runtime.getRuntime().exec(command.startsWith("CL") ? command.substring(3) : command);
             }
             {
