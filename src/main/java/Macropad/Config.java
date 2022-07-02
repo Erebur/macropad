@@ -17,6 +17,7 @@ import java.util.function.Consumer;
 public class Config {
     private int preset;
     private int debugLevel;
+    //Offset because Arduino wiring is slightly off
     private int offset;
     private ArrayList<ArrayList<String>> commands;
     private String output_command;

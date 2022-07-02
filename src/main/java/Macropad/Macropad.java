@@ -14,7 +14,6 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 public class Macropad {
     private final boolean presetSwitchDialog;
-    //Offset because Arduino wiring is slightly off
     @Getter
     @Setter
     private int port;
@@ -175,8 +174,10 @@ public class Macropad {
 
             debug("Preset Switch Dialog: %s".formatted(gewaehltesPreset != null ? gewaehltesPreset : "presetswichdialog abgebrochen, " + getPreset()), 2);
 
-            if (Objects.equals(gewaehltesPreset, "exit")) stop();
-            else setPreset(possibilities.indexOf(gewaehltesPreset));
+            if (Objects.equals(gewaehltesPreset, "exit"))
+                stop();
+            else if (possibilities.contains(gewaehltesPreset))
+                setPreset(possibilities.indexOf(gewaehltesPreset));
             possibilities.clear();
         } else {
             if (getPreset() >= config.getCommands().size()) setPreset(1);
