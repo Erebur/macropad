@@ -18,7 +18,7 @@ public class Macropad {
     @Setter
     private int port;
     private volatile Config config;
-    private Thread main;
+    private Thread buttonListener;
     private Thread fileWatcher;
     private SerialPort comPort;
 
@@ -44,10 +44,10 @@ public class Macropad {
             }
         } catch (Exception ignored) {
         }
-        new Macropad().init();
+        new Macropad().start();
     }
 
-    public void init() {
+    public void start() {
         // bei falscher eingabe wartet das programm ewig auf eingabe durch serial Port bekommt aber nie etwas -> das programm macht nicht und man kann nicht beenden (was ungünstig ist lol)
         if (getPort() == -1) {
             portSearchDialog();
@@ -56,17 +56,24 @@ public class Macropad {
         comPort = SerialPort.getCommPorts()[getPort()];
         comPort.openPort();
         debug("Started", 1);
-        main = new Thread(this::macropad);
+        buttonListener = new Thread(this::buttonListener);
         fileWatcher = new Thread(this::fileWatcher);
 
-        main.start();
+        buttonListener.start();
         fileWatcher.start();
     }
 
+    public void stop() {
+        fileWatcher.interrupt();
+        buttonListener.interrupt();
+        buttonListener = null;
+        fileWatcher = null;
+        comPort.closePort();
+    }
     /**
      * Main method that handels Button-presses
      */
-    public void macropad() {
+    public void buttonListener() {
         ArrayList<Integer> oldInput = new ArrayList<>();
         execCMD:
         while (true) {
@@ -80,6 +87,7 @@ public class Macropad {
                     break execCMD;
                 }
             }
+
             var input = nextNumber(s);
             if (!(config.getCommands().get(getPreset()).size() - 1 >= input - 1 + config.getOffset())) {
                 debug("command not found", 1);
@@ -136,14 +144,6 @@ public class Macropad {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public void stop() {
-        fileWatcher.interrupt();
-        main.interrupt();
-        main = null;
-        fileWatcher = null;
-        comPort.closePort();
     }
 
     private void reload() {

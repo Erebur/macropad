@@ -1,6 +1,5 @@
 package Macropad;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.Getter;
 import lombok.Setter;
@@ -38,16 +37,18 @@ public class Config {
 
     @SneakyThrows
     public static Config getConfig() {
-        String delimiter = System.getProperty("file.separator");
-        File confDir = new File(String.join(delimiter, System.getProperty("user.home"), ".config", "macropad"));
-        if (!confDir.exists()) log(String.format("folder was created %s", confDir.mkdirs()), System.out::println);
+        var delimiter = System.getProperty("file.separator");
+        var gson = new GsonBuilder().setPrettyPrinting().create();
 
-        File conf = new File(String.join(delimiter, confDir.getAbsolutePath(), "macropad.conf"));
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        var confFolder = new File(String.join(delimiter, System.getProperty("user.home"), ".config", "macropad"));
+        if (!confFolder.exists()) log(String.format("folder was created %s", confFolder.mkdirs()), System.out::println);
+
+        var confFile = new File(String.join(delimiter, confFolder.getAbsolutePath(), "macropad.conf"));
+
         Config config;
         // create the config file
-        if (!conf.exists()) {
-            try (FileWriter fr = new FileWriter(conf)) {
+        if (!confFile.exists()) {
+            try (FileWriter fr = new FileWriter(confFile)) {
                 config = new Config();
                 fr.write(gson.toJson(config));
                 return config;
@@ -57,7 +58,7 @@ public class Config {
             }
         }
         // reading existing config file
-        Scanner myReader = new Scanner(conf);
+        Scanner myReader = new Scanner(confFile);
         StringBuilder data = new StringBuilder();
         while (myReader.hasNextLine()) {
             var d = myReader.nextLine();
