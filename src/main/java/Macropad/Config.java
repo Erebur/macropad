@@ -18,6 +18,8 @@ public class Config {
     private int debugLevel;
     //Offset because Arduino wiring is slightly off
     private int offset;
+//    Name of the port we are trying
+    private String port;
     private ArrayList<ArrayList<String>> commands;
     private String output_command;
     private ArrayList<String> presetNames;
