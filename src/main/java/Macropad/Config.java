@@ -66,7 +66,11 @@ public class Config {
             var d = myReader.nextLine();
             if (!d.replaceAll(" ", "").startsWith("#")) data.append(d);
         }
-        return gson.fromJson(data.toString(), Config.class);
+        var fromJson = gson.fromJson(data.toString(), Config.class);
+
+        if( fromJson == null) throw new NullPointerException();
+
+        return fromJson;
     }
 
     private static void log(String s, Consumer<String> function) {

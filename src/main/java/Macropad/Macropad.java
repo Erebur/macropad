@@ -5,7 +5,10 @@ import com.fazecast.jSerialComm.SerialPort;
 import javax.swing.*;
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Scanner;
 
 import static java.lang.Thread.sleep;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
@@ -38,6 +41,8 @@ public class Macropad {
             }
         } catch (Exception ignored) {
         }
+        System.out.println(Arrays.toString(args));
+//        todo flags
         new Macropad();
     }
 
@@ -47,8 +52,13 @@ public class Macropad {
      * @param scanner reads the next line and
      * @return a number
      */
-    private static int nextNumber(Scanner scanner) throws NoSuchElementException {
-        String eingabe = scanner.nextLine();
+    private static int nextNumber(Scanner scanner) {
+        String eingabe;
+        if (scanner.hasNext()) {
+            eingabe = scanner.nextLine();
+        }else {
+            throw new RuntimeException("no input available");
+        }
         int input = 0;
         for (int i = 0; i < eingabe.length(); i++) {
             try {
@@ -85,45 +95,73 @@ public class Macropad {
         comPort.closePort();
     }
 
+    public void restartBL(){
+        buttonListener.interrupt();
+        buttonListener = null;
+        openPort();
+        buttonListener = new Thread(this::buttonListener);
+        buttonListener.start();
+    }
+
     /**
      * Main method that handels Button-presses
      */
     public void buttonListener() {
-        ArrayList<Integer> oldInput = new ArrayList<>();
-        execCMD:
-        while (true) {
-            Scanner s = new Scanner(comPort.getInputStream());
-            while (comPort.bytesAvailable() == 0) {
+        try {
+            ArrayList<Integer> oldInput = new ArrayList<>();
+            execCMD:
+            while (true) {
+                Scanner s = new Scanner(comPort.getInputStream());
+                while (comPort.bytesAvailable() <= 0) {
+                    try {
 //                the shorter you wait the more cpu usage u have
-                try {
-                    //noinspection BusyWait
-                    sleep(20);
-                } catch (InterruptedException e) {
-                    break execCMD;
-                }
-            }
+                        if (comPort.bytesAvailable() == -1) {
+                            String description = comPort.getPortDescription();
+                            System.out.println(Arrays.toString(SerialPort.getCommPorts()));
+                            comPort.closePort();
+//                            waits till the macropad gets reconected
+//                            todo should timeout after some time
+                            while (Arrays.stream(SerialPort.getCommPorts()).
+                                    noneMatch(serialPort -> Objects.equals(serialPort.getPortDescription(), description))) {
+                                System.out.println(Arrays.toString(SerialPort.getCommPorts()));
+                                //noinspection BusyWait
+                                sleep(200);
+                            }
+//                            just restart wtf
+                            restartBL();
+                        }
 
-            var input = nextNumber(s);
-            if (!(config.getCommands().get(getPreset()).size() - 1 >= input - 1 + config.getOffset())) {
-                debug("command not found", 1);
+                        //noinspection BusyWait
+                        sleep(20);
+                    } catch (InterruptedException e) {
+                        break execCMD;
+                    }
+                }
+                var input = nextNumber(s);
+                if (!(config.getCommands().get(getPreset()).size() - 1 >= input - 1 + config.getOffset())) {
+                    debug("command not found", 1);
 //                remove the next number from query
-                continue;
-            }
-            Command command = new Command(config.getCommands().get(getPreset()).get(input - 1 + config.getOffset()));
-//              Allows to release a command e.g. a Keypress
-            for (int i = 0; i < oldInput.size(); i++) {
-                if (input == oldInput.get(i)) {
-                    oldInput.remove(i);
-                    new Thread(() -> command.release(this)).start();
-                    continue execCMD;
+                    continue;
                 }
-            }
+                Command command = new Command(config.getCommands().get(getPreset()).get(input - 1 + config.getOffset()));
+//              Allows to release a command e.g. a Keypress
+                for (int i = 0; i < oldInput.size(); i++) {
+                    if (input == oldInput.get(i)) {
+                        oldInput.remove(i);
+                        new Thread(() -> command.release(this)).start();
+                        continue execCMD;
+                    }
+                }
 
-            debug(String.valueOf(input - 1), 3);
-            oldInput.add(input);
-            new Thread(() -> command.execute(this)).start();
+                debug(String.valueOf(input - 1), 3);
+                oldInput.add(input);
+                new Thread(() -> command.execute(this)).start();
+            }
+            debug("exited", 1);
+        } catch (Throwable e) {
+            System.out.println(e.getMessage());
+            stop();
         }
-        debug("exited", 1);
     }
 
     private void fileWatcher() {
